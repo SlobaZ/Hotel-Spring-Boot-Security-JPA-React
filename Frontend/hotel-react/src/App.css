@@ -1,0 +1,120 @@
+label {
+  display: block;
+  margin-top: 10px;
+}
+
+.card-container.card {
+  border: 2px solid gray;
+  max-width: 350px !important;
+  padding: 15px 35px;
+}
+
+.card {
+  background-color: #f7f7f7;
+  padding: 10px 25px 30px;
+  margin: 0 auto 20px;
+  margin-top: 30px;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  border-radius: 2px;
+  -moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+}
+
+.profile-img-card {
+  width: 90px;
+  height: 90px;
+  margin: 0 auto 6px;
+  display: block;
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
+  border-radius: 50%;
+}
+
+
+.navbar-brand {
+  margin-left: 2%;
+}
+.navbar-nav {
+  width: max-content;
+}
+.nav-item {
+  width: max-content;
+}
+.nav-link{
+  width: max-content;
+  font-size: 22px;    /* large; */
+}
+
+
+.homeContainerPicture{
+  background: url(pictureBody.png) no-repeat center center fixed;
+  background-size: auto;
+  width:1400px;
+  height: 650px; 
+}
+
+
+
+.searchDiv {
+  padding: 5px 50px;
+  border: 0.1px solid grey;
+  width: 35%;
+}
+
+.form-control input{
+  width:40%;
+  float: right;
+}
+.form-control select {
+  width:40%;
+  float: right;
+}
+
+.addButtonDiv {
+  width: 30%;
+}
+
+
+.profiTable{
+  font-size: 18px;
+}
+.profiTable td{
+  border:0.5px solid gray;
+  padding: 2px 20px 2px 20px;
+}
+
+thead {
+  background-color: #008B8B;
+  color: white;
+  font-size: larger;
+  text-align: center;
+} 
+
+tbody td{
+	text-align: center;
+}
+
+.table-striped>tbody>tr:nth-child(odd)>td, 
+.table-striped>tbody>tr:nth-child(odd)>th {
+   background-color: #FFFFF0; 
+ }
+
+
+ .table-hover tbody tr:hover td, 
+ .table-hover tbody tr:hover th {
+  background-color: #F0FFF0;
+}
+
+
+
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: black;
+  color: white;
+  text-align: center;
+}

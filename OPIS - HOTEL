@@ -1,0 +1,10 @@
+
+Pomocna klasa AuxiliaryClass:
+- Konvertuje String zapis datuma i vremena u Sql datum i vreme
+- Racuna broj dana provedenih u sobi
+- Racuna cenu aranzmana
+- Proverava da li je datum i vreme ulaska pre datuma i vremena izlaska
+- Proverava da li je datum i vreme ulaska posle sadasnjeg datuma i vremena
+
+
+
