@@ -117,13 +117,13 @@ class CreateReservationComponent extends Component {
 		
 										<div className = "form-group">
                                             <label> Date and Time Entry: </label>
-                                            <input placeholder="dateTimeEntryS" name="dateTimeEntryS" className="form-control" 
+                                            <input placeholder="dd.mm.yyyy. hh:mm" name="dateTimeEntryS" className="form-control" 
                                                 value={this.state.dateTimeEntryS} onChange={this.changeDateTimeEntrySHandler}/>
                                         </div>       
 
 										<div className = "form-group">
                                             <label> Date and Time Output: </label>
-                                            <input placeholder="dateTimeOutputS" name="dateTimeOutputS" className="form-control" 
+                                            <input placeholder="dd.mm.yyyy. hh:mm" name="dateTimeOutputS" className="form-control" 
                                                 value={this.state.dateTimeOutputS} onChange={this.changeDateTimeOutputSHandler}/>
                                         </div>                            
 

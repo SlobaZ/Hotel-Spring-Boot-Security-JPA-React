@@ -111,13 +111,13 @@ class ListReservationsComponent extends Component {
 
                     <div className="form-group">
                     <label className="form-control">  Date and time Entry: 
-                    <input type="text" name="searchDateTimeEntryS" value={this.state.searchDateTimeEntryS} onChange={this.handleChange}/> 
+                    <input placeholder="dd.mm.yyyy. hh:mm" type="text" name="searchDateTimeEntryS" value={this.state.searchDateTimeEntryS} onChange={this.handleChange}/> 
                     </label>
                     </div>
 
 					<div className="form-group">
                     <label className="form-control">  Date and time Output: 
-                    <input type="text" name="searchDateTimeOutputS" value={this.state.searchDateTimeOutputS} onChange={this.handleChange}/> 
+                    <input placeholder="dd.mm.yyyy. hh:mm" type="text" name="searchDateTimeOutputS" value={this.state.searchDateTimeOutputS} onChange={this.handleChange}/> 
                     </label>
                     </div>
 
