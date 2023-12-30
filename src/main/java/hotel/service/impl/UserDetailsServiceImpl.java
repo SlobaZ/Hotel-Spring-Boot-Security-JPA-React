@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import hotel.model.ERole;
-import hotel.model.Reservation;
 import hotel.model.User;
 import hotel.repository.UserRepository;
 import hotel.service.UserService;
@@ -37,8 +36,8 @@ public class UserDetailsServiceImpl implements UserService, UserDetailsService{
 
 
 	@Override
-	public User getById(Integer id) {
-		return userRepository.getById(id);
+	public User getReferenceById(Integer id) {
+		return userRepository.getReferenceById(id);
 	}
 
 
@@ -55,7 +54,7 @@ public class UserDetailsServiceImpl implements UserService, UserDetailsService{
 
 	@Override
 	public User delete(Integer id) {
-		User user = userRepository.getById(id);
+		User user = userRepository.getReferenceById(id);
 		if(user!=null) {
 			userRepository.delete(user);
 		}
@@ -102,7 +101,12 @@ public class UserDetailsServiceImpl implements UserService, UserDetailsService{
 	@Override
 	public Page<User> findAllForAdmin(int pageNum) {
 		PageRequest pageable = PageRequest.of(pageNum, 20);
-		return userRepository.findAllForAdmin(pageable);
+		return userRepository.findAll(pageable);
+	}
+	
+	@Override
+	public List<User> findAll() {
+		return userRepository.findAll();
 	}
 	
 	@Override
@@ -118,10 +122,7 @@ public class UserDetailsServiceImpl implements UserService, UserDetailsService{
 	}
 
 
-	@Override
-	public List<Reservation> guestData(Integer idG) {
-		return userRepository.guestData(idG);
-	}
+
 
 
 	

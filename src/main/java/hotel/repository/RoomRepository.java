@@ -1,5 +1,7 @@
 package hotel.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,5 +24,8 @@ public interface RoomRepository extends JpaRepository<Room,Integer>{
 			@Param("numberOfBeds") Integer numberOfBeds, 
 			@Param("free") String free,
 			Pageable pageRequest);
+	
+	
+	List<Room> findByFree(String no);
 
 }

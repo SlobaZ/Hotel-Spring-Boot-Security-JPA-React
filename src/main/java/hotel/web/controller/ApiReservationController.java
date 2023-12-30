@@ -24,10 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import hotel.model.Reservation;
 import hotel.model.Room;
-import hotel.model.User;
 import hotel.service.ReservationService;
 import hotel.service.RoomService;
-import hotel.service.UserService;
 import hotel.support.ReservationDTOToReservation;
 import hotel.support.ReservationToReservationDTO;
 import hotel.utils.AuxiliaryClass;
@@ -50,8 +48,6 @@ public class ApiReservationController {
 	@Autowired
 	private RoomService roomService;
 	
-	@Autowired
-	private UserService userService;
 	
 		
 
@@ -94,7 +90,7 @@ public class ApiReservationController {
 	@GetMapping("/{id}")
 	@PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYEE')")
 	ResponseEntity<ReservationDTO> getReservationById(@PathVariable Integer id){
-		Reservation reservation = reservationService.getById(id);
+		Reservation reservation = reservationService.getReferenceById(id);
 		if(reservation==null){
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
@@ -107,12 +103,7 @@ public class ApiReservationController {
 	@PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYEE')")
 	@DeleteMapping("/{id}")
 	ResponseEntity<ReservationDTO> deleteReservation(@PathVariable Integer id){
-		
-		Reservation forDelete = reservationService.getById(id);
-		Room room = roomService.getById(forDelete.getRoom().getId()) ;
-		room.setFree("YES");
-		roomService.save(room);
-		
+				
 		Reservation deleted = reservationService.delete(id);
 		
 		if(deleted == null) {
@@ -127,69 +118,65 @@ public class ApiReservationController {
 	@PreAuthorize("hasRole('ADMIN') || hasRole('EMPLOYEE') || hasRole('GUEST')")
 	@PostMapping(consumes = "application/json")
 	public ResponseEntity<ReservationDTO> addReservation ( @Validated @RequestBody ReservationDTO newreservationDTO){
-		if(newreservationDTO==null) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-		Room room = roomService.getById(newreservationDTO.getRoomId()) ;
-		
-		String entryLimit = newreservationDTO.getDateTimeEntryS();
-		String outputLimit = newreservationDTO.getDateTimeOutputS();
-		
-		Reservation reservation = null;
-		if(!reservationService.findByRoomOrderByDateTimeOutputTDesc(room).isEmpty()) {
-			List<Reservation> reservations = reservationService.findByRoomOrderByDateTimeOutputTDesc(room);
-			System.out.println(reservations);
-			if(!reservations.get(0).equals(null)) {
-			reservation = reservations.get(0);
+				
+		try {
+			if(newreservationDTO==null) {
+				return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 			}
+			Room room = roomService.getReferenceById(newreservationDTO.getRoomId());
+			if(room.getFree().equals("NO")) {
+				return new ResponseEntity<>(null, HttpStatus.CONFLICT);
+			}
+			if(AuxiliaryClass.correspondsToTheRange(newreservationDTO.getDateTimeEntryS(), newreservationDTO.getDateTimeOutputS())==false) {
+				return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+			}
+		
+			Reservation savedReservation = reservationService.save(toReservation.convert(newreservationDTO));
+			return new ResponseEntity<>( toDTO.convert(savedReservation), HttpStatus.CREATED);
+		}
+		catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST); 
 		}
 
-		if(AuxiliaryClass.correspondsToTheRange(entryLimit, outputLimit)==false) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-		
-		if(room.getFree().equals("NO")) {
-			if ( AuxiliaryClass.correspondsToTheRange(entryLimit, reservation.getDateTimeOutputS())==true ) {
-				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-			}
-		}
-		
-		room.setFree("NO");
-		
-		roomService.save(room);
-		
-		Reservation savedreservation = reservationService.save(toReservation.convert(newreservationDTO));
-		
-		return new ResponseEntity<>( toDTO.convert(savedreservation), HttpStatus.CREATED);
 	}
 	
 	
 		
 	@PreAuthorize("hasRole('ADMIN') || hasRole('EMPLOYEE')")
 	@PutMapping(value="/{id}" , consumes = "application/json")
-	public ResponseEntity<ReservationDTO> editReservation ( @PathVariable Integer id,
-			@Validated @RequestBody ReservationDTO reservationDTO ){
+	public ResponseEntity<ReservationDTO> editReservation ( @PathVariable Integer id, @Validated @RequestBody ReservationDTO reservationDTO ){
 		
+		try {
+				if(reservationDTO==null || id==null){ 
+					return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+				}				
+				reservationDTO.setId(id);
+				Reservation persisted = reservationService.save(toReservation.convert(reservationDTO));
+				return new ResponseEntity<>(toDTO.convert(persisted),HttpStatus.OK);
+		}
+		catch (Exception e) {
+				return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+		}
 	
-		Reservation updated = new Reservation();
-		
-		Room room = roomService.getById(reservationDTO.getRoomId());
-		User user = userService.getById(reservationDTO.getUserId());
-		
-		updated.setId(id);
-		updated.setCode(reservationDTO.getCode());
-		updated.setDateTimeEntryS(reservationDTO.getDateTimeEntryS());
-		updated.setDateTimeOutputS(reservationDTO.getDateTimeOutputS());
-		
-		updated.setRoom(room);
-		updated.setUser(user);
-		
-		ReservationDTO dto = toDTO.convert(updated);
-		
-		reservationService.save(toReservation.convert(dto));
+	}
 	
+	
+	
+	@PreAuthorize("hasRole('ADMIN') || hasRole('EMPLOYEE') || hasRole('GUEST')")
+	@GetMapping(value="/guestData/{idG}")
+	ResponseEntity<?> guestData(@PathVariable Integer idG){
 		
-		return new ResponseEntity<>(toDTO.convert(updated), HttpStatus.OK);
+		try {
+			List<String> dataGuest = reservationService.guestData(idG);
+			if(dataGuest==null){
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+			return new ResponseEntity<List<String>>( dataGuest , HttpStatus.OK );
+		}
+		catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+		}
+
 	}
 	
 	

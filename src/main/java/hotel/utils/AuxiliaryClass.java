@@ -88,6 +88,31 @@ public class AuxiliaryClass {
 		double totalPrice = numberOfDays * pricePerDay;
 		return totalPrice;
 	}
+	
+	
+	// provera da li je istekla rezervacija
+	public static boolean compareWithToday(String dateTimeOfEndReservationString) {
+		
+		boolean belong = false;
+		Date dateTimeOfEndReservation = null;
+		Date today = null;
+		String currentDate = null;
+		Date dateToday = new Date();
+		currentDate = DATE_TIME_FORMAT.format(dateToday);
+		
+		try {
+			dateTimeOfEndReservation = DATE_TIME_FORMAT.parse(dateTimeOfEndReservationString);
+			today = DATE_TIME_FORMAT.parse(currentDate);
+			if (dateTimeOfEndReservation.before(today)) {
+				belong = true;
+			}
+		} 
+		catch (ParseException e) {
+		}
+
+		return belong;
+	
+	}
 
 	
 	

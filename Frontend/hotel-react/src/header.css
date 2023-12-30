@@ -1,0 +1,333 @@
+/*  MOBILE  */
+:root {
+    --backgroundColor: white;
+    --backgroundColorLight: white;
+    --backgroundColorDark: #000000;
+    
+    --boxshadow: 0 8px 12px 0 rgba(0, 0, 0, 0.2), 0 10px 24px 0 rgba(0, 0, 0, 0.19);
+  	--boxshadowLight: 0 8px 12px 0 rgba(0, 0, 0, 0.2), 0 10px 24px 0 rgba(0, 0, 0, 0.19);
+  	--boxshadowDark: 0 10px 20px 0 #383838, 0 12px 26px 0 #383838;
+}
+
+.fullscreensize {
+    width:100%;
+    min-height: 100%;
+    margin:0;
+    background-color: var(--backgroundColor); 
+    border: 1px solid black;
+}
+
+
+.header {
+    position: fixed;      /*  static  */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 9%;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: center;
+    font-family: 'Quicksand', sans-serif;
+    border: 1px solid red;
+	color: white;
+	background: linear-gradient(#33CCFF , #006699 30% 70% , #33CCFF );
+}
+
+.header:hover{
+	border: 1px solid red;
+	color: white;
+	background: linear-gradient(#006699 , #33CCFF 47% 53% , #006699 );
+    box-shadow:var(--boxshadow); 
+}
+
+.headerLogo {
+    width: 50%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start; 
+    align-items: center;   
+}
+
+.headerLogoDiv {
+    margin-left: 5%;
+    margin-top: 2%;
+    width: 12%;
+}
+
+.headerLogoDiv img {
+    width: 100%;
+}
+
+.headerLogo img:hover {
+    opacity: 70%;
+}
+
+.headerText {
+    width: 50%;
+    justify-content: flex-end;
+    display: flex;
+    flex-direction: row;
+    align-items: center; 
+}
+
+.headerTextDiv {
+    margin-right: 5%;
+}
+
+.headerTextDiv h1 {
+    font-size: 4.9vw;
+    font-weight: 400;
+    margin: 0;
+    padding: 0;
+    padding-top: 6px;
+    color:  white;
+    text-decoration: none;
+}
+.headerTextDiv h1:hover {
+    color: darkslategrey;
+    text-shadow: 1.5px 1px 1px red;
+    transform: translateY(2px);
+}
+
+.headerTextDiv a {
+    color:  white;
+    text-decoration: none;
+}
+
+
+.navbar {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#active {
+    display: block;
+}
+
+#active p {
+    font-size: 4.1vw;   
+    letter-spacing: 1.5px;
+    margin: 2px;
+    padding: 0;   
+    color:  white;
+    text-shadow: 1.5px 1px 1px black;
+}
+
+.menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 60%;
+}
+
+.itemX {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    border: 1px solid #808080E6;
+    background: linear-gradient(#33CCFF , #006699 45% 55% , #33CCFF );
+}
+
+.itemX p {
+    font-size: 4.5vw;
+    margin: 0;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    z-index: 1;
+    text-decoration: none;
+    color:  white;
+    text-shadow: 1.5px 1px 1px black;
+}
+.itemX p:hover {
+    color: darkslategrey;
+    text-shadow: 1.5px 1px 1px red;
+    transform: translateY(2px);
+}
+
+.itemX a {
+	text-decoration: none;
+    color:  white;
+}
+.itemX a:hover {
+    color: darkslategrey;
+    text-shadow: 1.5px 1px 1px red;
+    transform: translateY(2px);
+}
+.item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 10px;
+    z-index: 1;   
+    border: 1px solid #808080E6;
+    background: linear-gradient(#33CCFF , #006699 45% 55% , #33CCFF );
+}
+
+.item p {
+    font-size: 4.5vw;
+    margin: 0;
+    z-index: 1;
+    text-decoration: none;
+    color:  white;
+    text-shadow: 1.5px 1px 1px black;
+}
+.item p:hover {
+    color: darkslategrey;
+    text-shadow: 1.5px 1px 1px red;
+    transform: translateY(2px);
+}
+
+.item a {
+	text-decoration: none;
+    color:  white;
+}
+.item a:hover {
+    color: darkslategrey;
+    text-shadow: 1.5px 1px 1px red;
+    transform: translateY(2px);
+}
+
+.screensize {
+	margin-top:25%;
+    margin-left:1%;
+    width:98%;
+}
+
+
+
+
+
+
+/*  DESKTOP  */
+@media screen and (min-width: 767px) {
+    .header {
+        height: 6%;
+    }
+
+    .headerLogo {
+        width: 3%; 
+        justify-content: center;   
+    }
+
+    .headerLogoDiv {
+        margin-left: 0;
+        margin-top: 0;
+        width: 70%;
+    }
+
+    .headerText {
+        width: 10%;
+        justify-content: center;    
+    }
+
+    .headerTextDiv {
+        margin-left: 3%;
+    }
+
+    .headerTextDiv h1 {
+        font-size: 1.1vw;
+        letter-spacing: 1.3px;
+        font-weight: 200;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .navbar {
+        width: 84%;
+        flex-direction: row;
+    }
+
+    #active {
+        display: none;
+    }
+
+    .menu {
+        flex-direction: row;
+        justify-content: flex-start;
+        width: 100%;
+    }
+
+    .itemX {
+        flex-direction: row;
+        justify-content: flex-end;
+        position: fixed; 
+        right: 5px;
+        width: 18%;
+        padding: 0;
+        border: none;
+        background: transparent;
+    }
+    .itemX p {
+        font-size: 1.1vw;
+        margin-right: 20px;
+    }
+
+    .item {
+        flex-direction: row;
+        justify-content: center;
+        width: 11%;
+        padding: 0;
+        border: none;
+        background: transparent;
+    }
+
+    .item p {
+        font-size: 1.1vw;
+    } 
+
+    .screensize {
+        margin-top:5%;
+        margin-left:5%;
+        width:90%;
+    }
+
+    
+}
+
+
+
+
+@media screen and (min-width: 767px) and (max-width: 1300px) {
+    .screensize {
+        margin-top:8%;
+        margin-left:5%;
+        width:90%;
+    }
+}
+
+
+
+
+@media screen and (min-width: 600px) and (max-width: 767px) {
+    .header {
+        height: 10%;
+    }
+    .headerLogoDiv {
+        width: 10%;
+    }
+    .headerTextDiv h1 {
+        font-size: 4.2vw;
+    }
+    .headerTextDiv a {
+        font-size: 4.2vw;
+    }
+    #active p {
+        font-size: 3.9vw;   
+    }
+    .itemX p {
+        font-size: 3.8vw;
+    }
+    .item p {
+        font-size: 3.8vw;
+    }
+}

@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
+import hotel.utils.PasswordContainsLowercaseUppercaseSpecialCharacterDigit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -77,9 +78,15 @@ public class AuthorizedController {
 	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
 		
 		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-			return ResponseEntity
-					.badRequest()
-					.body(new MessageResponse("Error: Username is already taken!"));
+			return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
+		}
+		
+		if (userRepository.existsByJmbg(signUpRequest.getUsername())) {
+			return ResponseEntity.badRequest().body(new MessageResponse("Error: Jmbg is already taken!"));
+		}
+		
+		if (!PasswordContainsLowercaseUppercaseSpecialCharacterDigit.passwordContainsLowercaseUppercaseSpecialCharacterDigit(signUpRequest.getPassword())) {
+			return ResponseEntity.badRequest().body(new MessageResponse("Error: Password must have atleast one: digit, uppercase character, lowercase character and specail character !"));
 		}
 
 

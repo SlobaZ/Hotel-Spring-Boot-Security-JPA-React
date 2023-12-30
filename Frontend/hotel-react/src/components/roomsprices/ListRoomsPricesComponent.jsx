@@ -1,69 +1,57 @@
-import React, { Component } from 'react'
-import RoomPriceService from '../../services/RoomPriceService'
+import React from 'react';
+import {useState, useEffect} from 'react';
+import RoomPriceService from '../../services/RoomPriceService';
 
-class ListRoomsPricesComponent extends Component {
-    constructor(props) {
-        super(props)
+const ListRoomsPrices = () => {
 
-        this.state = {
-                roomsprices: [],
-                
-        };
-        
-    }
+    const[roomsprices,setRoomsprices] = useState([]);
 
+    useEffect(() => {
+        refreshRoomsPrices();
+    },[]);
 
-    componentDidMount(){
-        this.refreshRoomsPrices();
-    }
-
-    refreshRoomsPrices() {
-       
+    function refreshRoomsPrices () {
         RoomPriceService.getRoomsPrices().then((response) => {
-          this.setState({ roomsprices: response.data });
+            setRoomsprices(response.data);
         });
-      }
-
-
-    render() {
-        return (
-            <div>
-                <br/>  
-				<br/> 
-                 <h2 className="text-center">Rooms Prices List</h2>
-
-                 <br></br>
-                 <div className = "row">
-                        <table className = "table table-striped table-bordered table-hover">
-
-                            <thead>
-                                <tr>
-                                    <th> Name</th>
-									<th> Number Of Rooms</th>
-                                    <th> Number Of Beds</th>
-                                    <th> Price </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {
-                                    this.state.roomsprices.map(
-                                        roomprice => 
-                                        <tr key = {roomprice.id}>
-                                             <td> {roomprice.name} </td>   
-											 <td> {roomprice.numberOfRooms}</td>
-                                             <td> {roomprice.numberOfBeds}</td>
-                                             <td> {roomprice.price}</td>
-                                        </tr>
-                                    )
-                                }
-                            </tbody>
-                        </table>
-
-                 </div>
-                 <br/>
-            </div>
-        )
     }
+
+    return (
+        <div>
+           <div className="tablemodel">
+                 				
+               <div class="rowModel">
+                    <p>Rooms Prices List</p>
+               </div>
+               
+               <table>
+                        <thead>
+                            <tr>
+                                <th> Name</th>
+                                <th> Number Of Rooms</th>
+                                <th> Number Of Beds</th>
+                                <th> Price </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {roomsprices.map(
+                                    roomprice => 
+                                    <tr key = {roomprice.id}>
+                                         <td> {roomprice.name} </td>   
+                                         <td> {roomprice.numberOfRooms}</td>
+                                         <td> {roomprice.numberOfBeds}</td>
+                                         <td> {roomprice.price}</td>
+                                    </tr>
+                                )
+                            }
+                        </tbody>
+                    </table>
+
+             </div>
+             <div className="empty"></div>
+        </div>
+    )
+
 }
 
-export default ListRoomsPricesComponent
+export default ListRoomsPrices;

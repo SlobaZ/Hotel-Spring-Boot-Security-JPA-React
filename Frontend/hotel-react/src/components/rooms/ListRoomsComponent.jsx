@@ -1,163 +1,151 @@
-import React, { Component } from 'react'
-import RoomService from '../../services/RoomService'
-import AuthService from "../../services/auth.service";
+import React from 'react';
+import {useState, useEffect} from 'react';
+import { useNavigate } from 'react-router-dom';
+import RoomService from '../../services/RoomService';
+import AuthenticationService from "../../services/AuthenticationService";
 
-class ListRoomsComponent extends Component {
-    constructor(props) {
-        super(props)
+const ListRooms = () => {
 
-        this.state = {
-                rooms: [],
-                searchName: '',
-                searchNumberOfBeds: '',
-				searchFree: ''
-                
-        };
-        
-        this.addRoom = this.addRoom.bind(this);
-        this.editRoom = this.editRoom.bind(this);
-        this.deleteRoom = this.deleteRoom.bind(this);
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-        
+    let navigate = useNavigate();
+	
+	const[rooms,setRooms] = useState([]);
+	const[searchName,setSearchName] = useState('');
+	const[searchNumberOfBeds,setSearchNumberOfBeds] = useState('');
+    const[searchFree,setSearchFree] = useState('');
+    const[showAdmin,setShowAdmin] = useState('');
+
+    useEffect(() => {
+		refreshRooms();
+     },[]);
+
+    const handleChangeName = (event) => {
+        setSearchName(event.target.value);
+    }
+	const handleChangeNumberOfBeds = (event) => {
+        setSearchNumberOfBeds(event.target.value);
+    }
+	const handleChangeFree = (event) => {
+        setSearchFree(event.target.value);
     }
 
-    handleChange(event) {
-       this.setState({[event.target.name]: event.target.value});  
-    }
-    
-    handleSubmit(event) {
+    const handleSubmit = (event) => {
         event.preventDefault();  
-       this.refreshRooms();
+        refreshRooms();
     }
 
-    deleteRoom(id){
+    const addRoom = () => {
+        navigate('/addorupdate-room/_add');
+    }
+
+    const editRoom  = (id) => {
+        navigate(`/addorupdate-room/${id}` , {id});
+    }
+
+	const deleteRoom = (id) => {
         RoomService.deleteRoom(id).then( response => {
-            this.setState({rooms: this.state.rooms.filter(room => room.id !== id)});
-        });
+            refreshRooms();
+         });
     }
 
-    editRoom(id){
-        this.props.history.push(`/addorupdate-room/${id}`);
-    }
-
-    componentDidMount(){
-        this.refreshRooms();
-    }
-
-    refreshRooms() {
-        const user = AuthService.getCurrentUser();
-    if (user) {
-      this.setState({
-        currentUser: user,
-        showEmployee: user.roles.includes("ROLE_EMPLOYEE"),
-        showAdmin: user.roles.includes("ROLE_ADMIN"),
-      });
-    }
+    function refreshRooms() {     
+    
+        const user = AuthenticationService.getCurrentUser();
+	    if (user) {
+	      setShowAdmin(user.roles.includes("ROLE_ADMIN"));
+	    }
         let config = { params: {} };
     
-        if (this.state.searchName !== "") {
-          config.params.name = this.state.searchName;
+        if (searchName !== "") {
+          config.params.name = searchName;
         }
-        if (this.state.searchNumberOfBeds  !== "") {
-          config.params.numberOfBeds = this.state.searchNumberOfBeds;
+        if (searchNumberOfBeds !== "") {
+          config.params.numberOfBeds = searchNumberOfBeds;
         }
- 		if (this.state.searchFree  !== "") {
-          config.params.free = this.state.searchFree;
+        if (searchFree !== "") {
+          config.params.free = searchFree;
         }
-
         RoomService.getRooms(config).then((response) => {
-          this.setState({ rooms: response.data });
+          		setRooms(response.data);
         });
       }
 
-    addRoom(){
-        this.props.history.push('/addorupdate-room/_add');
-    }
 
-    render() {
-        const { showAdmin } = this.state;
-        return (
-            <div>
-                <br/>
-                
-                 <div className="searchDiv">
-                 <form onSubmit={this.handleSubmit}>
-                   
-                    <div className="form-group">
-                    <label className="form-control">  Name: 
-                    <input type="text" name="searchName" value={this.state.searchName} onChange={this.handleChange}/>
-                    </label>
-                    </div>
 
-                    <div className="form-group">
-                    <label className="form-control">  Number Of Beds: 
-                    <input type="text" name="searchNumberOfBeds" value={this.state.searchNumberOfBeds} onChange={this.handleChange}/> 
-                    </label>
-                    </div>
-
- 					<div className="form-group">
-                    <label className="form-control">  Free: 
-                    <input type="text" name="searchFree" value={this.state.searchFree} onChange={this.handleChange}/> 
-                    </label>
-                    </div>
-
-                    <div className="form-group">
-                    <input type="submit" value="Search" />
-                    </div>
+     return (
+        <div>
+                <div className="box">
+                <form className="form-inline" onSubmit={handleSubmit}>
+                    
+                        <label className="mt-2 mt-sm-0 mr-2">Name: </label>
+                        <input type="text" className="form-control mr-4" placeholder="Enter name"  value={searchName} onChange={handleChangeName} />
+                    
+                    
+                        <label className="mt-2 mt-sm-0 mr-2">Number of beds: </label>
+                        <input type="number" className="form-control mr-4" placeholder="Number of beds"  value={searchNumberOfBeds} onChange={handleChangeNumberOfBeds}/>  
+                 
+                    
+                        <label className="mt-2 mt-sm-0 mr-2">Free: </label>
+                        <select  className="form-control mr-4" value={searchFree} onChange={handleChangeFree}>
+	                                <option value={""}> --- Select ---</option>
+	                                <option value={"YES"}> YES </option>
+	                                <option value={"NO"}> NO </option>
+                            </select>  
+                                            
+                        <button type="submit" className="btn btn-search"> <i className='fa fa-search'></i> Search</button>
+                    
                 </form>
                 </div>
-                
-                <br/>  
-                 <h2 className="text-center">Rooms List</h2>
 
-                 {showAdmin && (
-                 <div className="addButtonDiv">
-                    <button className="btn btn-primary btn-block" onClick={this.addRoom}> Add Room</button>
-                 </div>
-                  )}
-                 <br></br>
-                 <div className = "row">
-                        <table className = "table table-striped table-bordered table-hover">
+                <div className="tablemodel">
+                 				
+                                 <div class="rowModel">
+                                     <p>Rooms List</p>
+                                     {showAdmin && (
+                                       <button className="btn btn-add" onClick={ addRoom }> <i class='fas fa-plus'></i> Add Room </button>
+                                       )}
+                                 </div>
+               
+                                       <table>
+               
+                                           <thead>
+                                               <tr>
+                                                    <th> Name</th>
+                                                    <th> Number Of Beds</th>
+                                                    <th> Free </th>
+                                                   {showAdmin && (    <th> Update </th> )}
+                                                   {showAdmin && (    <th> Delete </th> )}
+                                               </tr>
+                                           </thead>
+                                           <tbody>
+                                               { rooms.map( room => 
+                                                       <tr key = {room.id}>
+                                                            <td data-label="Name"> {room.name} </td>   
+                                                            <td data-label="Number of beds"> {room.numberOfBeds}</td>
+                                                            {room.free ==="YES" &&
+                                                            <td data-label="Free">{room.free}</td>
+								                            }
+								                            {room.free ==="NO" &&
+                                                            <td data-label="Free" style={{color: "red"}} >{room.free} <i class="fa fa-times"></i> </td>
+								                            }
+                                                            {showAdmin && ( 
+                                                            <td data-label="Update"> <button onClick={ () => editRoom(room.id)} className="btn btn-update"> <i className='fas fa-pencil-alt'></i> Update </button> </td>
+                                                            )}   
+                                                            {showAdmin && ( 
+                                                             <td data-label="Delete"> <button onClick={ () => deleteRoom(room.id)} className="btn btn-delete"> <i className='fas fa-trash-alt'></i> Delete </button> </td>
+                                                            )}
+                                                       </tr>
+                                                   )
+                                               }
+                                           </tbody>
+                                       </table>
+                                       <div className="empty"></div>
+                       </div>
+            
 
-                            <thead>
-                                <tr>
-                                    <th> Name</th>
-                                    <th> Number Of Beds</th>
-                                    <th> Free </th>
-                                    {showAdmin && (    <th> Actions</th>  )}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {
-                                    this.state.rooms.map(
-                                        room => 
-                                 			<tr key = {room.id}>
-                                             <td> {room.name} </td>   
-                                             <td> {room.numberOfBeds}</td>
-											{room.free ==="YES" &&
-                                             <td>{room.free}</td>
-											}
-										     {room.free ==="NO" &&
-                                             <td style={{color: "red"}} >{room.free}</td>
-											}
-                                             {showAdmin && ( 
-                                             <td>
-                                                 <button onClick={ () => this.editRoom(room.id)} className="btn btn-info">Update </button>
-                                                 <button style={{marginLeft: "10px"}} onClick={ () => this.deleteRoom(room.id)} className="btn btn-danger">Delete </button>
-                                             </td>
-                                             )}
-                                        </tr>
-                                    )
-                                }
-                            </tbody>
-                        </table>
-						
-                 </div>
-                 <br/>
-            </div>
-        )
-    }
+
+        </div>
+    )
+
+
 }
-
-export default ListRoomsComponent
+export default ListRooms;

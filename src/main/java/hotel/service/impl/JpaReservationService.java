@@ -1,6 +1,7 @@
 package hotel.service.impl;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,12 +9,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import hotel.model.User;
 import hotel.model.Reservation;
 import hotel.model.Room;
 import hotel.repository.ReservationRepository;
 import hotel.repository.RoomRepository;
-import hotel.repository.UserRepository;
 import hotel.service.ReservationService;
 import hotel.utils.AuxiliaryClass;
 
@@ -26,15 +25,13 @@ public class JpaReservationService implements ReservationService {
 	
 	@Autowired
 	private RoomRepository roomRepository;
-	
-	@Autowired
-	private UserRepository userRepository;
+		
 	
 	
 
 	@Override
-	public Reservation getById(Integer id) {
-		return reservationRepository.getById(id);
+	public Reservation getReferenceById(Integer id) {
+		return reservationRepository.getReferenceById(id);
 	}
 
 	@Override
@@ -50,13 +47,10 @@ public class JpaReservationService implements ReservationService {
 
 	@Override
 	public Reservation save(Reservation reservation) {
-		reservation.setCode(AuxiliaryClass.AssignCode());
+	
 		Room room = reservation.getRoom();
-		User user = reservation.getUser();
 		room.setFree("NO");
-		room.setUser(user);
 		roomRepository.save(room);
-		userRepository.save(user);	
 		return reservationRepository.save(reservation);
 	}
 
@@ -67,10 +61,13 @@ public class JpaReservationService implements ReservationService {
 
 	@Override
 	public Reservation delete(Integer id) {
-		Reservation reservation = reservationRepository.getById(id);
+		Reservation reservation = reservationRepository.getReferenceById(id);
 		if(reservation!=null) {
+			Room room = roomRepository.getReferenceById(reservation.getRoom().getId()) ;
+			room.setFree("YES");
+			roomRepository.save(room);
 			reservationRepository.delete(reservation);
-		}
+		}	
 		return reservation;
 	}
 
@@ -94,7 +91,58 @@ public class JpaReservationService implements ReservationService {
 	public List<Reservation> findByRoomOrderByDateTimeOutputTDesc(Room room) {
 		return reservationRepository.findByRoomOrderByDateTimeOutputTDesc(room);
 	}
+	
+	
+	
+	@Override
+	public List<String> guestData(Integer idG) {
+		
+		List<Reservation> reservations = reservationRepository.findByUserId(idG);
+		
+		if(reservations==null){
+			return null;
+		}
+		
+		
+		Reservation	reservation = reservations.get(0);
+		for(Reservation reserv : reservations) {
+			if(reservation.getDateTimeEntryT().before(reserv.getDateTimeEntryT())) {
+				reservation = reserv;
+			}
+		}
+		Integer idGuest = reservation.getUser().getId();
+		String guestId = Integer.toString(idGuest) ; 
+		String guestUsername = reservation.getUser().getUsername();
+		Integer idRoom = reservation.getRoom().getId();
+		String roomId = Integer.toString(idRoom) ; 
+		String roomName = reservation.getRoom().getName();
+		String enter = reservation.getDateTimeEntryS();
+		String exit = reservation.getDateTimeOutputS();
+		
+		Double numberOfDaysD = AuxiliaryClass.TheNumberOfDays(enter, exit);
+		Double priceOfDay = AuxiliaryClass.price(numberOfDaysD, roomName);
+		
+		String numberOfDays = String.valueOf ( numberOfDaysD ) ; 
+		String price = String.valueOf ( priceOfDay ) ; 
 
+		List<String> dataGuest = new ArrayList<String>();
+		dataGuest.add(guestId);
+		dataGuest.add(guestUsername);
+		dataGuest.add(roomId);
+		dataGuest.add(roomName);
+		dataGuest.add(enter);
+		dataGuest.add(exit);
+		dataGuest.add(numberOfDays);
+		dataGuest.add(price);
+		
+		return dataGuest;
+		
+	}
+
+	@Override
+	public Reservation findByRoomId(Integer id) {
+		return reservationRepository.findByRoomId(id);
+	}
 	
 	
 

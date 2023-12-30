@@ -8,3 +8,4 @@ USE hotelspringbootsecurityjpareact;
 GRANT ALL ON hotelspringbootsecurityjpareact.* TO 'jwduser'@'%';
 
 FLUSH PRIVILEGES;
+

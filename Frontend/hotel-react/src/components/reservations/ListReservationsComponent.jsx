@@ -1,190 +1,173 @@
-import React, { Component } from 'react'
-import ReservationService from '../../services/ReservationService'
-import AuthService from "../../services/auth.service";
+import React from 'react';
+import {useState, useEffect} from 'react';
+import { useNavigate } from 'react-router-dom';
+import ReservationService from '../../services/ReservationService';
+import AuthenticationService from "../../services/AuthenticationService";
 
-class ListReservationsComponent extends Component {
-    constructor(props) {
-        super(props)
+const ListReservations = () => {
 
-        this.state = {
-                rooms: [],
-                reservations: [],
-				searchRoomId: '',
-                searchCode: '',
-                searchDateTimeEntryS: '',
-                searchDateTimeOutputS: ''
-        };
-        
-        this.addReservation = this.addReservation.bind(this);
-        this.editReservation = this.editReservation.bind(this);
-        this.deleteReservation = this.deleteReservation.bind(this);
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-        
+    let navigate = useNavigate();
+	
+    const[showEmployeeAndAdmin,setShowEmployeeAndAdmin] = useState('');
+    const[rooms,setRooms] = useState([]);
+	const[reservations,setReservations] = useState([]);
+	const[searchRoomId,setSearchRoomId] = useState('');
+    const[searchCode,setSearchCode] = useState('');
+    const[searchDateTimeEntryS,setSearchDateTimeEntryS] = useState('');
+    const[searchDateTimeOutputS,setSearchDateTimeOutputS] = useState('');
+
+    const handleChangeRoomId = (event) => {
+        setSearchRoomId(event.target.value);
+    }
+	const handleChangeCode = (event) => {
+        setSearchCode(event.target.value);
+    }
+	const handleChangeDateTimeEntryS = (event) => {
+        setSearchDateTimeEntryS(event.target.value);
+    }
+    const handleChangeDateTimeOutputS = (event) => {
+        setSearchDateTimeOutputS(event.target.value);
     }
 
-    handleChange(event) {
-       this.setState({[event.target.name]: event.target.value});  
-    }
-    
-    handleSubmit(event) {
+    const handleSubmit = (event) => {
         event.preventDefault();  
-       this.refreshReservations();
+        refreshReservations();
     }
 
-    deleteReservation(id){
+    const addReservation = () => {
+        navigate('/addorupdate-reservation/_add');
+    }
+
+    const editReservation  = (id) => {
+        navigate(`/addorupdate-reservation/${id}` , {id});
+    }
+
+	const deleteReservation = (id) => {
         ReservationService.deleteReservation(id).then( response => {
-            this.setState({reservations: this.state.reservations.filter(reservation => reservation.id !== id)});
-        });
+            refreshReservations();
+         });
     }
 
-    editReservation(id){
-        this.props.history.push(`/addorupdate-reservation/${id}`);
+    function formatDateTime  (value)  {
+        const enteredValue = value;
+        const day = enteredValue.substring(8, 10);
+        const month = enteredValue.substring(5, 7);
+        const year = enteredValue.substring(0, 4);
+        const time = enteredValue.substring(11, 16);
+        const formatedValue = day.concat(".", month, ".", year, ". ", time);
+        return formatedValue;
     }
 
-    componentDidMount(){
-        this.refreshReservations();
-    }
-
-    refreshReservations() {
-        const user = AuthService.getCurrentUser();
-    if (user) {
-      this.setState({
-        currentUser: user,
-        showEmployeeAndAdmin: user.roles.includes("ROLE_EMPLOYEE") || user.roles.includes("ROLE_ADMIN"),
-        showAdmin: user.roles.includes("ROLE_ADMIN"),
-      });
-    }
+    function refreshReservations () {
+        const user = AuthenticationService.getCurrentUser();
+        if (user) {
+            setShowEmployeeAndAdmin(user.roles.includes("ROLE_EMPLOYEE") || user.roles.includes("ROLE_ADMIN"));
+          }
+     
         let config = { headers:{ Authorization: 'Bearer ' + user.accessToken } , params: {} };
     
-		if (this.state.searchRoomId  !== "") {
-            config.params.roomId = this.state.searchRoomId;
+		if (searchRoomId  !== "") {
+            config.params.roomId = searchRoomId;
           }
-        if (this.state.searchCode !== "") {
-          config.params.code = this.state.searchCode;
+        if (searchCode !== "") {
+          config.params.code = searchCode;
         }
-        if (this.state.searchDateTimeEntryS  !== "") {
-          config.params.dateTimeEntryS = this.state.searchDateTimeEntryS;
+        if (searchDateTimeEntryS  !== "") {
+          config.params.dateTimeEntryS = formatDateTime(searchDateTimeEntryS);
         }
-		if (this.state.searchDateTimeOutputS  !== "") {
-          config.params.dateTimeOutputS = this.state.searchDateTimeOutputS;
+		if (searchDateTimeOutputS  !== "") {
+          config.params.dateTimeOutputS = formatDateTime(searchDateTimeOutputS);
         }
 
         ReservationService.getRooms().then((response) => {
-            this.setState({ rooms: response.data });
+            setRooms(response.data);
           });
         ReservationService.getReservations(config).then((response) => {
-          this.setState({ reservations: response.data });
+            setReservations(response.data);
         });
 
       }
 
-    addReservation(){
-        this.props.history.push('/addorupdate-reservation/_add');
-    }
+      useEffect(() => {
+		refreshReservations();
+     },[]);
 
-    render() {
-        const {showEmployeeAndAdmin} = this.state;
-        const { showAdmin } = this.state;
-        return (
-            <div>
-                <br/>
-                
-                 <div className="searchDiv">
-                 <form onSubmit={this.handleSubmit}>
 
-					<div className="form-group">
-                    <label className="form-control">  Room: 
-                    <select name="searchRoomId" value={this.state.searchRoomId} onChange={this.handleChange}> 
-                            <option value={''}> --- Odaberi ---</option>  
-                            {this.state.rooms.map(room => (
+     return (
+        <div>
+                <div className="box">
+                <form className="form-inline" onSubmit={handleSubmit}>
+
+                        <label className="mt-2 mt-sm-0 mr-2">Room: </label>
+                        <select  className="form-control mr-4" value={searchRoomId} onChange={handleChangeRoomId}>
+                            <option value={''}> --- Select ---</option>  
+                            {rooms.map(room => (
                             <option value={room.id}>{room.name}</option> ))}
-                    </select>
-                    </label>
-                    </div>
-                   
-                    <div className="form-group">
-                    <label className="form-control">  Code:
-                    <input type="text" name="searchCode" value={this.state.searchCode} onChange={this.handleChange}/>
-                    </label>
-                    </div>
+                        </select> 
+                    
+                        <label className="mt-2 mt-sm-0 mr-2">Code: </label>
+                        <input type="text" className="form-control mr-4" placeholder="Enter Code"  value={searchCode} onChange={handleChangeCode} />
 
-                    <div className="form-group">
-                    <label className="form-control">  Date and time Entry: 
-                    <input placeholder="dd.mm.yyyy. hh:mm" type="text" name="searchDateTimeEntryS" value={this.state.searchDateTimeEntryS} onChange={this.handleChange}/> 
-                    </label>
-                    </div>
+                        <label className="mt-2 mt-sm-0 mr-2">Date and time Entry &#10095; </label>
+                        <input type="datetime-local"  className="form-control mr-4"  value={searchDateTimeEntryS} onChange={handleChangeDateTimeEntryS} />
 
-					<div className="form-group">
-                    <label className="form-control">  Date and time Output: 
-                    <input placeholder="dd.mm.yyyy. hh:mm" type="text" name="searchDateTimeOutputS" value={this.state.searchDateTimeOutputS} onChange={this.handleChange}/> 
-                    </label>
-                    </div>
-
-                   
-
-                    <div className="form-group">
-                    <input type="submit" value="Search" />
-                    </div>
+                        <label className="mt-2 mt-sm-0 mr-2">Date and time Output &#10094; </label>
+                        <input type="datetime-local" className="form-control mr-4" value={searchDateTimeOutputS} onChange={handleChangeDateTimeOutputS} />                        
+                                            
+                        <button type="submit" className="btn btn-search"> <i className='fa fa-search'></i> Search</button>
+                    
                 </form>
                 </div>
-                
-                 <br/>             
-                 <h2 className="text-center">Reservations List</h2>
 
-				<p>{}</p>
+                <div className="tablemodel">
+                 				
+                                 <div class="rowModel">
+                                     <p>Reservations List</p>
+                                     {showEmployeeAndAdmin && (
+                                       <button className="btn btn-add" onClick={ addReservation }> <i class='fas fa-plus'></i> Add Reservation </button>
+                                       )}
+                                 </div>
+               
+                                       <table>
+               
+                                           <thead>
+                                               <tr>
+                                               <th> ID</th>
+                                                <th> Code</th>
+                                                <th> Room </th>
+                                                <th> Date Time Entry</th>
+                                                <th> Date Time Output</th>
+                                                <th> User </th>
+                                                   {showEmployeeAndAdmin && (    <th> Update </th> )}
+                                                   {showEmployeeAndAdmin && (    <th> Delete </th> )}
+                                               </tr>
+                                           </thead>
+                                           <tbody>
+                                               { reservations.map( reservation => 
+                                                    <tr key = {reservation.id}>
+                                                        <td> {reservation.id} </td> 
+                                                        <td> {reservation.code} </td>   
+                                                        <td> {reservation.roomName} </td>   
+                                                        <td> {reservation.dateTimeEntryS}</td>
+                                                        <td> {reservation.dateTimeOutputS}</td>
+                                                        <td> {reservation.userUsername} </td>
+                                                            {showEmployeeAndAdmin && ( 
+                                                            <td data-label="Update"> <button onClick={ () => editReservation(reservation.id)} className="btn btn-update"> <i className='fas fa-pencil-alt'></i> Update </button> </td>
+                                                            )}   
+                                                            {showEmployeeAndAdmin && ( 
+                                                             <td data-label="Delete"> <button onClick={ () => deleteReservation(reservation.id)} className="btn btn-delete"> <i className='fas fa-trash-alt'></i> Delete </button> </td>
+                                                            )}
+                                                       </tr>
+                                                   )
+                                               }
+                                           </tbody>
+                                       </table>
+                                       <div className="empty"></div>
+                       </div>
 
-                 {showEmployeeAndAdmin && ( 
-                 <div className="addButtonDiv">
-                    <button className="btn btn-primary btn-block" onClick={this.addReservation}> Add Reservation</button>
-                 </div>
-                  )}
-                 <br></br>
-             
-                 <div className = "row">
-                        <table className = "table table-striped table-bordered table-hover">
 
-                            <thead>
-                                <tr>
-                                    <th> ID</th>
-                                    <th> Code</th>
-                                    <th> Room </th>
-									<th> Date Time Entry</th>
-                                    <th> Date Time Output</th>
-									<th> User </th>
-                                    {showEmployeeAndAdmin && (    <th> Actions</th>  )}
-                                </tr>
-                            </thead>
-                           
-                            <tbody>
-                            {
-                                    this.state.reservations.map(
-                                        reservation => 
-                                        <tr key = {reservation.id}>
-                                             <td> {reservation.id} </td> 
-                                             <td> {reservation.code} </td>   
-											 <td> {reservation.roomName} </td>   
-                                             <td> {reservation.dateTimeEntryS}</td>
-                                             <td> {reservation.dateTimeOutputS}</td>
-											 <td> {reservation.userUsername} </td>
-                                             {showEmployeeAndAdmin && ( 
-											<td>
-                                                 <button onClick={ () => this.editReservation(reservation.id)} className="btn btn-info">Update </button>
-                                                 <button style={{marginLeft: "10px"}} onClick={ () => this.deleteReservation(reservation.id)} className="btn btn-danger">Delete </button>
-                                            </td>
-                                             )}
-                                        </tr>
-                                    )
-                                }
-                            </tbody>
-                        
-                        </table>
-                    
-                 </div>
-                  <br/>
-            </div>
-        )
-    }
+        </div>
+    )
+
 }
-
-export default ListReservationsComponent
+export default ListReservations;

@@ -8,12 +8,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.repository.query.Param;
 
 import hotel.model.ERole;
-import hotel.model.Reservation;
 import hotel.model.User;
 
 public interface UserService {
 	
-	User getById(Integer id);
+	User getReferenceById(Integer id);
 	
 	User save(User user);
 	List<User> saveAll(List<User> users);
@@ -36,6 +35,7 @@ public interface UserService {
 	
 	
 	Page<User> findAllForAdmin(int pageNum);
+	List<User> findAll();
 	
 	Page<User> searchForAdmin(
 			@Param("username") String username, 
@@ -43,8 +43,6 @@ public interface UserService {
 			@Param("city") String city,
 			 int pageNum);
 	
-	
-	List<Reservation> guestData( @Param("idG") Integer idG);
 	
 
 }

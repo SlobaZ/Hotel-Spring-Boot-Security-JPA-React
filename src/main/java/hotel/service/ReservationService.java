@@ -10,7 +10,7 @@ import hotel.model.Room;
 
 public interface ReservationService {
 	
-	Reservation getById(Integer id);
+	Reservation getReferenceById(Integer id);
 	List<Reservation> findAll();
 	Page<Reservation> findAll(int pageNum);
 	Reservation save(Reservation reservation);
@@ -26,6 +26,11 @@ public interface ReservationService {
 
 	
 	List<Reservation> findByRoomOrderByDateTimeOutputTDesc (Room room);
+	
+	
+	List<String> guestData( @Param("idG") Integer idG);
+	
+	Reservation findByRoomId(Integer id);
 	
 	
 }

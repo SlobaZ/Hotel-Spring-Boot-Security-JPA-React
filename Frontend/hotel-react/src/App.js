@@ -1,182 +1,198 @@
-import React, { Component } from "react";
-import { HashRouter, Switch, Route, Link } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
+import React from 'react';
+import {useState, useEffect } from 'react';
+import { Routes, Route, Link } from "react-router-dom";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'font-awesome/css/font-awesome.min.css';
+import logo from './logo.jpg'; 
+
+import "./header.css";
+import "./table.css";
+import "./buttons.css";
 import "./App.css";
-import logo from './logo.jpg';
+import "./footer.css"; 
 
-import AuthService from "./services/auth.service";
+import AuthenticationService from "./services/AuthenticationService.js";
+import DarkModeService from "./services/DarkModeService";
 
-import Login from "./components/login.component";
-import Register from "./components/register.component";
-import Home from "./components/home.component";
-import Profile from "./components/profile.component";
-import ListRoomsComponent from "./components/rooms/ListRoomsComponent.jsx";
-import CreateRoomComponent from "./components/rooms/CreateRoomComponent.jsx";
-import ListUsersComponent from "./components/users/ListUsersComponent.jsx";
-import CreateUserComponent from "./components/users/CreateUserComponent.jsx";
-import ListReservationsComponent from "./components/reservations/ListReservationsComponent";
-import CreateReservationComponent from "./components/reservations/CreateReservationComponent";
-import ListRoomsPricesComponent from "./components/roomsprices/ListRoomsPricesComponent.jsx";
-import ReserveComponent from "./components/reserve/ReserveComponent";
-import AddReservationComponent from "./components/reserve/AddReservationComponent";
-import ListUsersCalculationsComponent from "./components/guestpricecalculation/ListUsersCalculationsComponent.jsx";
-import ShowUsersCalculations from "./components/guestpricecalculation/ShowUsersCalculations.jsx";
+import Login from "./components/LoginComponent.js";
+import Register from "./components/RegisterComponent.js";
+import Home from "./components/HomeComponent.js";
+import Profile from "./components/ProfileComponent.js";
+import ListRooms from "./components/rooms/ListRoomsComponent.jsx";
+import AddOrUpdateRoom from "./components/rooms/AddOrUpdateRoomComponent.jsx";
+import ListUsers from "./components/users/ListUsersComponent.jsx";
+import AddOrUpdateUser from "./components/users/AddOrUpdateUserComponent.jsx";
+import ListReservations from "./components/reservations/ListReservationsComponent";
+import AddOrUpdateReservation from "./components/reservations/AddOrUpdateReservationComponent";
+import ListRoomsPrices from "./components/roomsprices/ListRoomsPricesComponent.jsx";
+import CreateReservation from "./components/reserve/CreateReservation.jsx";
+import Reserve from "./components/reserve/Reserve.jsx";
+import ShowUsersCalculations from "./components/reserve/ShowUsersCalculations.jsx";
 
-class App extends Component {
+import RoomService from './services/RoomService';
 
-  constructor(props) {
-    super(props);
-    this.logOut = this.logOut.bind(this);
 
-    this.state = {
-      showEmployee: false,
-      showPassenger: false,
-      showAdmin: false,
-      showEmployeeAndAdmin: false,
-      currentUser: false,
-    };
-  }
 
-  componentDidMount() {
+function App() {  
+
+  const[showMenu, setShowMenu] = useState(false);
+	const[screenWidth, setScreenWidth] = useState(0);
+	const[currentUser,setCurrentUser] = useState(null);
+  const[showEmployeeAndAdmin,setShowEmployeeAndAdmin] = useState(false);
+
+
   
-    const user = AuthService.getCurrentUser();
+  useEffect(() => {   
+    window.addEventListener('resize' , updateDimensions());
+		setScreenWidth(window.innerWidth);
+    refreshApp();
+    checkFreeRoomsToday();
+  },[]);
 
-    if (user) {
-      this.setState({
-        currentUser: user,
-        showGuest: user.roles.includes("ROLE_GUEST") ,
-        showEmployeeAndAdmin: user.roles.includes("ROLE_EMPLOYEE") || user.roles.includes("ROLE_ADMIN"),
 
-      });
+  function refreshApp() {
+    const user = AuthenticationService.getCurrentUser();
+		if (user) {
+			setCurrentUser(user);
+      setShowEmployeeAndAdmin(user.roles.includes("ROLE_EMPLOYEE") || user.roles.includes("ROLE_ADMIN"));
+		}
+    const mode = DarkModeService.getDarkMode();
+    if(mode==="dark"){
+      DarkModeService.addDarkMode();
     }
   }
 
-  logOut() {
-  AuthService.logout();
-    this.setState({
-      currentUser: false,
-      showGuest: false,
-      showEmployeeAndAdmin: false,
-    });
+
+  function checkFreeRoomsToday() {
+    RoomService.checkFreeRoomsToday().then((response) => {
+    })
+    .catch((error) => {
+        console.log('error: ' + error);
+    }); 
   }
 
-  render() {
-    const { currentUser,  showEmployeeAndAdmin} = this.state;
+  function logOut () {
+    AuthenticationService.logout();
+    setCurrentUser(false);
+    setShowEmployeeAndAdmin(false);
+    window.location.reload(); 
+   }
 
-    return (
-      <div>      
+   const showNavigation  = (showMenu) => { 
+    if(showMenu===false){
+       setShowMenu(true);
+    }
+    else{
+      setShowMenu(false);
+    }
+   }
+
+
+  const updateDimensions = () => {
+     setScreenWidth(window.innerWidth);
+  }
+
+  const addDarkMode = () => {
+    DarkModeService.setDarkMode();
+ }
+
+
+
+   return (
+
+    <div className="fullscreensize"> 
+
+    <div className="header">   
+
+    <div className="headerLogo">
+        <div className="headerLogoDiv">
+            <img src={logo} alt="Logo" />
+        </div>
+    </div>
+
+    <div className="headerText">
+        <div className="headerTextDiv">
+            <h1> <Link to={"/"}> <i class="fa fa-institution"></i> Hotel </Link> </h1>  
+        </div>
+    </div>
+
+
+  <div className="navbar">
+    <div  id="active"><p onClick={ () => showNavigation(showMenu)}> MENU <i className="fa fa-bars"></i> </p></div>
+      { (showMenu || screenWidth > 767) && (
+      <div className="menu">
       
-      <nav className="navbar navbar-expand-md navbar-dark bg-dark">
-        
-        <div className="logo">
-        <img src={logo} width="50" height="50" alt="Logo" />
-        </div>
-        
-          <Link to={"/"} className="navbar-brand">
-            Hotel
-          </Link>
-          <div className="navbar-nav mr-auto ml-4">
-          
-          <li className="nav-item ml-3">
-              <Link to={"/roomsprices"} className="nav-link">
-                Room Price
-              </Link>
-            </li>
-           
-            <li className="nav-item ml-3">
-              <Link to={"/rooms"} className="nav-link">
-                Rooms
-              </Link>
-            </li>
-            
-            <li className="nav-item ml-3">
-              <Link to={"/reserve"} className="nav-link">
-                Reserve
-              </Link>
-            </li>
+      <div className="item"><p><Link to={"/roomsprices"}>  <i class="fa fa-money"></i>  Room Price </Link></p></div> 
+      
+      <div className="item"><p><Link to={"/rooms"}> <i class="fas fa-bed"></i> Rooms </Link></p></div> 
 
-   
-            { showEmployeeAndAdmin &&  (
-              <li className="nav-item ml-3">
-                <Link to={"/users"} className="nav-link">
-                  Users
-                </Link>
-              </li>
-            )}
+      <div className="item"><p><Link to={"/createreservation"}> <i class="fa fa-shopping-basket"></i> Reserve </Link></p></div> 
 
-            { showEmployeeAndAdmin &&  (
-            <li className="nav-item ml-3">
-              <Link to={"/reservations"} className="nav-link">
-                Reservations
-              </Link>
-            </li>
-            )}
-            
-            { showEmployeeAndAdmin &&  (
-              <li className="nav-item ml-3">
-                <Link to={"/calculation"} className="nav-link">
-                  Calculation
-                </Link>
-              </li>
-            )}
+      { showEmployeeAndAdmin &&  (
+      <div className="item"><p><Link to={"/users"}> <i class='fa fa-users'></i> Users </Link></p></div>
+      )}
 
-
-          </div>
-          {currentUser ? (
-            <div className="navbar-nav ml-auto mr-4">
-             
-              <li className="nav-item mr-4">
-                <Link to={"/profile"} className="nav-link">
-                  {currentUser.username}
-                </Link>
-              </li>
-              <li className="nav-item mr-1">
-                <a href="/" className="nav-link" onClick={this.logOut}>
-                  LogOut
-                </a>
-              </li>
-            </div>
-          ) : (
-            <div className="navbar-nav ml-auto mr-4" >
-              <li className="nav-item mr-4">
-                <Link to={"/login"} className="nav-link">
-                  Login
-                </Link>
-              </li>
-
-              <li className="nav-item mr-1">
-                <Link to={"/register"} className="nav-link">
-                  Sign Up
-                </Link>
-              </li>
-            </div>
-          )}
-        </nav>
-
-       <div className="container mt-3" >
-       <HashRouter>
-          <Switch>
-            <Route exact path="/" component={Home} />
-            <Route path="/roomsprices" component={ListRoomsPricesComponent} />
-            <Route path="/rooms" component={ListRoomsComponent} />
-            <Route path="/addorupdate-room/:id" component={CreateRoomComponent} /> 
-            <Route path="/users" component={ListUsersComponent} />
-	        <Route path="/update-user/:id" component={CreateUserComponent} />
-            <Route path="/reservations" component={ListReservationsComponent} />
-            <Route path="/addorupdate-reservation/:id" component={CreateReservationComponent} /> 
-            <Route path="/reserve" component={ReserveComponent} />
-            <Route path="/addreservation/:id" component={AddReservationComponent} />
-            <Route path="/calculation" component={ListUsersCalculationsComponent} />
-            <Route path="/showcalculate/:id" component={ShowUsersCalculations} />
-            <Route path="/login" component={Login} />
-            <Route path="/register" component={Register} />
-            <Route path="/profile" component={Profile} />
-          </Switch>
-         </HashRouter>
-        </div>
+      { showEmployeeAndAdmin &&  (
+      <div className="item"><p><Link to={"/reservations"}> <i class="fa fa-file-text"></i>  Reservations </Link></p></div>
+      )}
+      
+      {currentUser ? (
+      <div className="itemX">
+      <p><Link to={"/profile"}> <i class='fas fa-user-alt'></i> {currentUser.username} </Link></p>
+      <p onClick={logOut}><Link to={"/"}> <i class="fas fa-sign-out-alt"></i> LogOut </Link></p>
       </div>
-    );
-  }
+      ) : (
+      <div className="itemX">
+      <p><Link to={"/login"}> <i class="fas fa-sign-in-alt"></i> Login </Link></p>
+      <p><Link to={"/register"}> <i class="fa fa-edit"></i> Sign Up </Link></p>
+      </div>
+      )}
+      </div>
+    )}
+  </div>
+
+    </div>  
+
+     <div className="screensize" >
+    
+     <Routes>
+          <Route exact path="/" element={<Home/>} />
+          <Route path="/roomsprices" element={<ListRoomsPrices/>} />
+          <Route path="/rooms" element={<ListRooms/>} />
+          <Route path="/addorupdate-room/:id" element={<AddOrUpdateRoom/>} /> 
+          <Route path="/users" element={<ListUsers/>} />
+          <Route path="/update-user/:id" element={<AddOrUpdateUser/>} />
+          <Route path="/reservations" element={<ListReservations/>} />
+          <Route path="/addorupdate-reservation/:id" element={<AddOrUpdateReservation/>} /> 
+          <Route path="/createreservation" element={<CreateReservation/>} />
+          <Route path="/reserve/:id" element={<Reserve/>} />
+          <Route path="/showcalculate/:id" element={<ShowUsersCalculations/>} />
+          <Route path="/login" element={<Login/>} />
+          <Route path="/register" element={<Register/>} />
+          <Route path="/profile" element={<Profile/>} />
+       </Routes>
+
+      </div>
+
+      <div className="footer">
+        <div className="footerText">
+            <p className="text-center">Hotel Spring Boot Security JPA React</p>
+        </div>
+        <div className="footerMode">
+            <button className="btn btn-mode" onClick={ () => addDarkMode()}> Mode </button>
+        </div>
+        </div>
+      
+
+    </div>
+  );
+
+
+
 }
 
+
 export default App;
+
+
+

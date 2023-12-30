@@ -1,46 +1,49 @@
 import axios from 'axios';
-import authHeader from './auth-header';
+import authHeader from './AuthenticationHeader';
 
 const RESERVATION_API_BASE_URL = "http://localhost:8080/api/reservations";
 const ROOM_API_BASE_URL = "http://localhost:8080/api/rooms";
 const USER_API_BASE_URL = "http://localhost:8080/api/users";
 
 
-class ReservationService { 
-
-    getAlls(){
+    const getAlls = () => {
 		return axios.get(RESERVATION_API_BASE_URL + '/all' , { headers: authHeader() } );
 	}
 
-    getReservations(config){
+    const getReservations = (config) => {
         return axios.get(RESERVATION_API_BASE_URL, config );
     }
 
-    createReservation(reservation){
+    const createReservation = (reservation) => {
         return axios.post(RESERVATION_API_BASE_URL, reservation, { headers: authHeader() });
     }
 
-    getReservationById(reservationId){
+    const getReservationById = (reservationId) => {
         return axios.get(RESERVATION_API_BASE_URL + '/' + reservationId, { headers: authHeader() });
     }
 
-    updateReservation(reservation, reservationId){
+    const updateReservation = (reservationId, reservation) => {
         return axios.put(RESERVATION_API_BASE_URL + '/' + reservationId, reservation, { headers: authHeader() });
     }
 
-    deleteReservation(reservationId){
+    const deleteReservation = (reservationId) => {
         return axios.delete(RESERVATION_API_BASE_URL + '/' + reservationId, { headers: authHeader() });
     }
 
-    getRooms(){
+    const getRooms = () => {
         return axios.get(ROOM_API_BASE_URL + '/all' , { headers: authHeader() } );
     }
     
-    getUsers(){
+    const getUsers = () => {
         return axios.get(USER_API_BASE_URL + '/all' , { headers: authHeader() } );
     }
 
+    const guestData = (userId) => {
+    	return axios.get(RESERVATION_API_BASE_URL + '/guestData/' + userId , { headers: authHeader() });
+    }
 
+const ReservationService = { 
+    getAlls, getReservations, createReservation, getReservationById, updateReservation, deleteReservation, getRooms, getUsers, guestData
 }
 
-export default new ReservationService()
+export default ReservationService;

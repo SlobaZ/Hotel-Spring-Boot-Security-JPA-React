@@ -2,16 +2,15 @@ package hotel.model;
 
 import java.sql.Timestamp;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.validation.constraints.NotEmpty;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 
 @Entity
@@ -22,26 +21,29 @@ public class Reservation {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	
-	@NotEmpty(message = "*Please provide a code")
+	@Column
 	private String code;
 	
-	@Column(nullable=false)
+	@Column
 	private Timestamp dateTimeEntryT;
 	
-	
+	@Column(nullable=false)
 	private String dateTimeEntryS;
 	
-	@Column(nullable=false)
+	@Column
 	private Timestamp dateTimeOutputT;
 	
-	
+	@Column(nullable=false)
 	private String dateTimeOutputS;
 	
-	@OneToOne(fetch=FetchType.LAZY)
+	
+	
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="user")
 	private User user;
 	
-	@OneToOne(fetch=FetchType.LAZY)
+
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="room")
 	private Room room;
 	
@@ -115,9 +117,7 @@ public class Reservation {
 	public void setRoom(Room room) {
 		this.room = room;
 	}
-	
-	
-	
+
 	
 	
 

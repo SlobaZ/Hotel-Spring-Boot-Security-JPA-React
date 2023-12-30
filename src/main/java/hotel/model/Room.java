@@ -1,21 +1,15 @@
 package hotel.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.PositiveOrZero;
-import javax.validation.constraints.Size;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
-import org.springframework.lang.Nullable;
 
 
 @Entity
@@ -26,25 +20,18 @@ public class Room {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	
-	@NotEmpty(message = "*Please provide a name of room")
+	@NotEmpty(message = "Please provide a name of room")
 	@Size(max=25)
 	private String name;
 	
-	@PositiveOrZero(message = "*Only positive number")
+	@PositiveOrZero(message = "Only positive number")
 	private Integer numberOfBeds;
 	
 	@Column
 	private String free;
 
-	@Nullable
-	@OneToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name="user")
-	@NotFound(action=NotFoundAction.IGNORE)
-	private User user;
-
 	
 	public Room() {
-		this.free = "YES";
 	}
 	
 
@@ -53,15 +40,6 @@ public class Room {
 		this.name = name;
 		this.numberOfBeds = numberOfBeds;
 		this.free = free;
-	}
-
-
-	public Room(Integer id, String name, Integer numberOfBeds, String free, User user) {
-		this.id = id;
-		this.name = name;
-		this.numberOfBeds = numberOfBeds;
-		this.free = free;
-		this.user = user;
 	}
 
 
@@ -96,19 +74,6 @@ public class Room {
 		this.free = free;
 	}
 
-
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
-	
-	
-	
-	
 	
 
 }

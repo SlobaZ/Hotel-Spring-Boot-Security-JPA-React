@@ -31,6 +31,13 @@ public interface ReservationRepository extends JpaRepository<Reservation,Integer
 	
 	
 	List<Reservation> findByRoomOrderByDateTimeOutputTDesc (Room room);
+	
+	@Query("SELECT r FROM Reservation r WHERE r.user.id = :idG")
+	List<Reservation> findByUserId( @Param("idG") Integer idG);
+	
+	
+	@Query("SELECT r FROM Reservation r WHERE r.room.id = :id")
+	Reservation  findByRoomId(Integer id);
 
 
 }

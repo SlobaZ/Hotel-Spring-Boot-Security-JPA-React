@@ -32,25 +32,26 @@ public class ReservationDTOToReservation implements Converter<ReservationDTO, Re
 	@Override
 	public Reservation convert(ReservationDTO dto) {
 		
-		Room room = roomService.getById(dto.getRoomId());
-		User user = userService.getById(dto.getUserId());
+		Room room = roomService.getReferenceById(dto.getRoomId());
+		User user = userService.getReferenceById(dto.getUserId());
 		
 		Reservation reservation = null;
 		
 		if(dto.getId()!=null){
-			reservation = reservationService.getById(dto.getId());
+			reservation = reservationService.getReferenceById(dto.getId());
 			
 			if(reservation == null){
-				throw new IllegalStateException("Tried to "
-						+ "modify a non-existant Reservation");
+				throw new IllegalStateException("Tried to modify a non-existant Reservation");
 			}
+			
+			reservation.setId(dto.getId());
+			reservation.setCode(dto.getCode());
 		}
 		else {
 			reservation = new Reservation();
+			reservation.setCode(AuxiliaryClass.AssignCode());
 		}
 		
-		reservation.setId(dto.getId());
-		reservation.setCode(AuxiliaryClass.AssignCode());
 		reservation.setDateTimeEntryT(AuxiliaryClass.ConvertStringToSqlDateAndTime(dto.getDateTimeEntryS()));
 		reservation.setDateTimeEntryS(dto.getDateTimeEntryS());        
 		reservation.setDateTimeOutputT(AuxiliaryClass.ConvertStringToSqlDateAndTime(dto.getDateTimeOutputS()));

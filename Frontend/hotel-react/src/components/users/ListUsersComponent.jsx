@@ -1,165 +1,166 @@
-import React, { Component } from 'react'
-import UserService from '../../services/UserService'
-import AuthService from "../../services/auth.service";
+import React from 'react';
+import {useState, useEffect} from 'react';
+import {useNavigate, Link} from 'react-router-dom';
+import UserService from '../../services/UserService';
+import AuthenticationService from "../../services/AuthenticationService";
 
 
-class ListUsersComponent extends Component {
-    constructor(props) {
-        super(props)
+const ListUsers = () => {
 
-        this.state = {
-                users: [],
-                searchUsername: '',
-                searchJmbg: '',
-                searchCity: ''
-        };
-        
-        this.addUser = this.addUser.bind(this);
-        this.editUser = this.editUser.bind(this);
-        this.deleteUser = this.deleteUser.bind(this);
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-        
-    }
+    let navigate = useNavigate();
+	
+	const[showAdmin,setShowAdmin] = useState('');
+    const[showEmployeeAndAdmin,setShowEmployeeAndAdmin] = useState('');
+	const[users,setUsers] = useState([]);
+	const[searchUsername,setSearchUsername] = useState('');
+	const[searchJmbg,setSearchJmbg] = useState('');
+    const[searchCity,setSearchCity] = useState('');
+	const[showSearch,setShowSearch] = useState(false);
 
-    handleChange(event) {
-       this.setState({[event.target.name]: event.target.value});  
-    }
     
-    handleSubmit(event) {
+	const handleChangeUsername = (event) => {
+        setSearchUsername(event.target.value);
+    }
+
+	const handleChangeJmbg = (event) => {
+        setSearchJmbg(event.target.value);
+    }
+
+    const handleChangeCity = (event) => {
+        setSearchCity(event.target.value);
+    }
+
+	const handleSubmit = (event) => {
         event.preventDefault();  
-        this.refreshUsers();
+        refreshUsers();
     }
 
-    deleteUser(id){
+    const deleteUser = (id) => {
         UserService.deleteUser(id).then( response => {
-            this.setState({users: this.state.users.filter(user => user.id !== id)});
-        });
+            refreshUsers();
+         });
     }
 
-    editUser(id){
-        this.props.history.push(`/update-user/${id}`);
+	const addUser = () => {
+        navigate("/register");
     }
 
-    componentDidMount(){
-		this.refreshUsers();
+    const showUsersCalculations = (id) => {
+        navigate(`/showcalculate/${id}`, {id});
     }
 
-    refreshUsers() {
-    const user = AuthService.getCurrentUser();
-    if (user) {
-      this.setState({
-        currentUser: user,
-        showAdmin: user.roles.includes("ROLE_ADMIN"),
-        showEmployeeAndAdmin: user.roles.includes("ROLE_EMPLOYEE") || user.roles.includes("ROLE_ADMIN"),
-      });
-    }
-
-        let config = { headers:{ Authorization: 'Bearer ' + user.accessToken } , params: {} };
-        if (this.state.searchUsername !== "") {
-          config.params.username = this.state.searchUsername;
+	
+	function refreshUsers () {
+		const user = AuthenticationService.getCurrentUser();
+	    if (user) {
+			setShowAdmin(user.roles.includes("ROLE_ADMIN"));
+            setShowEmployeeAndAdmin(user.roles.includes("ROLE_EMPLOYEE") || user.roles.includes("ROLE_ADMIN"));
+	    }
+		let config = { headers:{ Authorization: 'Bearer ' + user.accessToken } , params: {} };
+        if (searchUsername !== "") {
+          config.params.username = searchUsername;
         }
-        if (this.state.searchJmbg !== "") {
-          config.params.jmbg = this.state.searchJmbg;
+        if (searchJmbg !== "") {
+            config.params.jmbg = searchJmbg;
         }
-        if (this.state.searchCity !== "") {
-            config.params.city = this.state.searchCity;
-          }
+        if (searchCity !== "") {
+            config.params.city = searchCity;
+        }
         UserService.getUsers(config).then((response) => {
-          this.setState({ users: response.data });
+           setUsers(response.data);
         });
-      }
+        
+	}
 
-    addUser(){
-        this.props.history.push('/register');
-    }
 
-    render() {
-     const { showAdmin } = this.state;
-     const {showEmployeeAndAdmin} = this.state;
-        return (
+    useEffect(() => {
+
+		refreshUsers();
+
+      },[]);
+	
+	
+	
+	return (
            
             <div>
-                <br/>
-            
-                 <div className="searchDiv">
-                <form onSubmit={this.handleSubmit}>
-                   
-                    <div className="form-group">
-                    <label className="form-control">  Username: 
-                    <input type="text" name="searchUsername" value={this.state.searchUsername} onChange={this.handleChange}/>
-                    </label>
-                    </div>
 
-                    <div className="form-group">
-                    <label className="form-control">  JMBG: 
-                    <input type="text" name="searchJmbg" value={this.state.searchJmbg} onChange={this.handleChange}/> 
-                    </label>
-                    </div>
 
-                    <div className="form-group">
-                    <label className="form-control">  City: 
-                    <input type="text" name="searchCity" value={this.state.searchCity} onChange={this.handleChange}/> 
-                    </label>
-                    </div>
+				   
+                <button className="btn btn-select" onClick={ () => setShowSearch(!showSearch)}> <i class='fas fa-plus'></i> Search</button>
+                <br/><br/>
+                { showSearch && (
 
-                    <div className="form-group">
-                    <input type="submit" value="Search" />
-                    </div>
-
+                <div className="box">
+                <form className="form-inline" onSubmit={handleSubmit}>
+                    
+                        <label className="mt-2 mt-sm-0 mr-2">Username: </label>
+                        <input type="text" className="form-control mr-4" placeholder="Search by username"  value={searchUsername} onChange={handleChangeUsername} />
+                    
+                    
+                        <label className="mt-2 mt-sm-0 mr-2">Jmbg: </label>
+                        <input type="number" className="form-control mr-4" placeholder="Search by jmbg"  value={searchJmbg} onChange={handleChangeJmbg}/>  
+                 
+                        <label className="mt-2 mt-sm-0 mr-2">City: </label>
+                        <input type="text" className="form-control mr-4" placeholder="Search by city"  value={searchCity} onChange={handleChangeCity}/>
+                                                                    
+                        <button type="submit" className="btn btn-search"> <i className='fa fa-search'></i> Search</button>
+                    
                 </form>
                 </div>
-            
-                <br/>  
-                 <h2 className="text-center">User List</h2>
-                 {showEmployeeAndAdmin && (
-                  <div className="addButtonDiv">
-                     <button className="btn btn-primary btn-block"  onClick={this.addUser}> Add User</button>
-                  </div>
-                 )}
 
-                 <br></br>
-                {showEmployeeAndAdmin && ( 
-                 <div className = "row">
-                        <table className = "table table-striped table-bordered table-hover">
 
-                            <thead>
+                )}
+
+              
+			   {showEmployeeAndAdmin && ( 
+                 <div className="tablemodel">
+
+                <div className="rowModel">
+                 <p>Users List</p>
+                    <button className="btn btn-add" onClick={ addUser}> <i className='fas fa-plus'></i> Add User</button>
+                 </div>
+
+                        <table>
+                                <thead>
                                 <tr>
                                     <th> UserName</th>
                                     {showAdmin && (   <th> Password</th>   )}
+                                    <th> Jmbg</th>
                                     <th> City</th>
-                                    <th> JMBG</th>
-                                    <th> Phone</th>
-                                    <th> Actions</th>
+                                    <th class="fixno"> Update</th>
+                                    {showAdmin && ( 
+                                    <th class="fixno"> Delete</th>
+                                    )}
+                                    <th class="fixno"> Calculate</th>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                { this.state.users.map(
-                                        user => 
+                                </thead>
+                                { users.map( user => 
                                         <tr key = {user.id}>
-                                             <td> {user.username} </td>  
-                                             {showAdmin && (  <td> {user.password}</td>  )}
-                                             <td> {user.city}</td>
-                                             <td> {user.jmbg}</td>
-                                             <td> {user.phone}</td>
-                                             <td>
-                                                 <button onClick={ () => this.editUser(user.id)} className="btn btn-info">Update </button>
-                                                 {showAdmin && ( 
-                                                 <button style={{marginLeft: "10px"}} onClick={ () => this.deleteUser(user.id)} className="btn btn-danger">Delete </button>
-                                                 )}
-                                             </td>
+                                             <td data-label="UserName"> {user.username} </td>  
+                                             {showAdmin && (  <td data-label="Password"> {user.password}</td>  )}
+                                             <td data-label="Jmbg"> {user.jmbg}</td>
+                                             <td data-label="City"> {user.city}</td>
+                                             <td data-label="Update"><Link className="btn btn-update" to={`/update-user/${user.id}`} > <i className='fas fa-pencil-alt'></i> Update </Link> </td>
+                                             {showAdmin && ( 
+                                              <td data-label="Delete"><button onClick={ () => deleteUser(user.id)} className="btn btn-delete"> <i className='fas fa-trash-alt'></i> Delete </button></td>
+                                             )}
+                                             <td data-label="Calculate"><button onClick={ () => showUsersCalculations(user.id)} className="btn btn-select"> <i class="fa fa-calculator"></i> Calculate </button></td>
                                         </tr>
                                     )}
-                            </tbody>
                         </table>
-
+                        <div className="empty"></div>
                  </div>
-                  )}
-			<br/>
-            </div>
+			
+			)}
+			
+        </div>
             
         )
-    }
+
+	
+	
 }
 
-export default ListUsersComponent
+export default ListUsers;
+

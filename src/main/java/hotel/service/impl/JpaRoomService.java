@@ -7,9 +7,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import hotel.model.Reservation;
 import hotel.model.Room;
+import hotel.repository.ReservationRepository;
 import hotel.repository.RoomRepository;
 import hotel.service.RoomService;
+import hotel.utils.AuxiliaryClass;
 
 @Service
 public class JpaRoomService implements RoomService {
@@ -17,10 +20,15 @@ public class JpaRoomService implements RoomService {
 	
 	@Autowired
 	private RoomRepository roomRepository;
+	
+	@Autowired
+	private ReservationRepository reservationRepository;
+	
+	
 
 	@Override
-	public Room getById(Integer id) {
-		return roomRepository.getById(id);
+	public Room getReferenceById(Integer id) {
+		return roomRepository.getReferenceById(id);
 	}
 
 	@Override
@@ -46,7 +54,7 @@ public class JpaRoomService implements RoomService {
 
 	@Override
 	public Room delete(Integer id) {
-		Room room = roomRepository.getById(id);
+		Room room = roomRepository.getReferenceById(id);
 		if(room!=null) {
 			roomRepository.delete(room);
 		}
@@ -62,4 +70,28 @@ public class JpaRoomService implements RoomService {
 		return roomRepository.search(name, numberOfBeds, free, pageable);
 	}
 
+	@Override
+	public Room setAvailableRoomWhenUpdatingReservation(Integer id) {
+		Room room = roomRepository.getReferenceById(id);
+		room.setFree("YES");
+		return roomRepository.save(room);
+	}
+
+
+	@Override
+	public List<Room> checkFreeRoomsToday() {
+		List <Room> rooms = roomRepository.findByFree("NO");
+		for (Room room : rooms) {
+			Reservation reservation = reservationRepository.findByRoomId(room.getId());
+			if(AuxiliaryClass.compareWithToday(reservation.getDateTimeOutputS())==true) {
+				room.setFree("YES");
+				roomRepository.save(room);
+			}
+		}
+		return rooms;
+	}
+	
+
 }
+
+

@@ -24,11 +24,11 @@ public class RoomDTOToRoom implements Converter<RoomDTO,Room>{
 		Room room = null;
 		
 		if(dto.getId()!=null){
-			room = roomService.getById(dto.getId());
+			
+			room = roomService.getReferenceById(dto.getId());
 			
 			if(room == null){
-				throw new IllegalStateException("Tried to "
-						+ "modify a non-existant Room");
+				throw new IllegalStateException("Tried to modify a non-existant Room");
 			}
 			
 		}

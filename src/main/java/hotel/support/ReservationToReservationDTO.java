@@ -16,6 +16,7 @@ public class ReservationToReservationDTO implements Converter<Reservation, Reser
 
 	@Override
 	public ReservationDTO convert(Reservation reservation) {
+		
 		if(reservation==null){
 			return null;
 		}

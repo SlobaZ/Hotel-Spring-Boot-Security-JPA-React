@@ -11,7 +11,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import hotel.model.ERole;
-import hotel.model.Reservation;
 import hotel.model.User;
 
 @Repository
@@ -20,6 +19,8 @@ public interface UserRepository extends JpaRepository<User,Integer>{
 	Optional<User> findByUsername(String username);
 	
 	Boolean existsByUsername(String username);
+	
+	Boolean existsByJmbg(String jmbg);
 	
 	Boolean existsByPassword(String password);
 	
@@ -42,11 +43,7 @@ public interface UserRepository extends JpaRepository<User,Integer>{
 			@Param("jmbg") String jmbg, 
 			@Param("city") String city, 
 			Pageable pageRequest);
-		
-	
-	@Query("SELECT u FROM User u ")
-	Page<User> findAllForAdmin(Pageable pageRequest);
-	
+			
 	
 	@Query("SELECT u FROM User u WHERE "
 			+ "(:username IS NULL or u.username like :username ) AND "
@@ -61,8 +58,7 @@ public interface UserRepository extends JpaRepository<User,Integer>{
 	
 	
 	
-	@Query("SELECT r FROM Reservation r WHERE r.user.id = :idG")
-	List<Reservation> guestData( @Param("idG") Integer idG);
+
 
 	
 	

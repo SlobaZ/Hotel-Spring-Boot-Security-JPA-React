@@ -3,19 +3,19 @@ package hotel.model;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.PositiveOrZero;
-import javax.validation.constraints.Size;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table( name="user", uniqueConstraints = {@UniqueConstraint(columnNames = "username"), @UniqueConstraint(columnNames = "jmbg")} )
@@ -25,23 +25,23 @@ public class User {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	
-	@NotEmpty(message = "*Please provide a username")
+	@NotEmpty(message = "Please provide a username")
 	@Size(min=5)
 	private String username;
 	
-	@NotEmpty(message = "*Please provide a password")
+	@NotEmpty(message = "Please provide a password")
 	@Size(min=6)
 	private String password;
 	
-	@NotEmpty(message = "*Please provide a city")
+	@NotEmpty(message = "Please provide a city")
 	@Size(max = 50)
 	private String city;
 	
-	@PositiveOrZero(message = "*Only positive number")
+	@PositiveOrZero(message = "Only positive number")
 	@Size(min=13,max=13)
 	private String jmbg;
 	
-	@PositiveOrZero(message = "*Only positive number")
+	@PositiveOrZero(message = "Only positive number")
 	@Size(min=6,max=10)
 	private String phone;
 	

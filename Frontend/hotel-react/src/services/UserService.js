@@ -1,36 +1,35 @@
 import axios from 'axios';
-import authHeader from './auth-header';
+import authHeader from './AuthenticationHeader';
 
 const USER_API_BASE_URL = "http://localhost:8080/api/users";
 
-class UserService { 
+
 	
-	getAll(){
+    const getAll = () => { 
 		return axios.get(USER_API_BASE_URL + '/all' , { headers: authHeader() } );
 	}
 
-    getUsers(config){
+    const getUsers = (config) => {
         return axios.get(USER_API_BASE_URL , config  );
     }
 
 
-    getUserById(userId){
+    const getUserById = (userId) => {
         return axios.get(USER_API_BASE_URL + '/' + userId , { headers: authHeader() });
     }
 
-    updateUser(user, userId){
+    const updateUser = (userId, user) => {
         return axios.put(USER_API_BASE_URL + '/' + userId, user , { headers: authHeader() });
     }
 
-    deleteUser(userId){
+    const deleteUser = (userId) => {
         return axios.delete(USER_API_BASE_URL + '/' + userId , { headers: authHeader() });
     }
     
-    guestData(userId){
-    	return axios.get(USER_API_BASE_URL + '/guestData/' + userId , { headers: authHeader() });
-    }
 
 
+const UserService = { 
+    getAll, getUsers, getUserById, updateUser, deleteUser
 }
 
-export default new UserService()
+export default UserService;

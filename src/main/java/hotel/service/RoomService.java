@@ -9,7 +9,7 @@ import hotel.model.Room;
 
 public interface RoomService {
 	
-	Room getById(Integer id);
+	Room getReferenceById(Integer id);
 	List<Room> findAll();
 	Page<Room> findAll(int pageNum);
 	Room save(Room room);
@@ -21,5 +21,9 @@ public interface RoomService {
 			@Param("numberOfBeds") Integer numberOfBeds,
 			@Param("free") String free,
 			 int pageNum);
+	
+	Room setAvailableRoomWhenUpdatingReservation(Integer id);
+		
+	List<Room> checkFreeRoomsToday();
 
 }

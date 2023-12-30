@@ -1,120 +1,109 @@
-label {
-  display: block;
-  margin-top: 10px;
+:root {
+  --backgroundColor: white;
+  --backgroundColorLight: white;
+  --backgroundColorDark: #000000;
+
+  --colorFont: black;
+  --colorFontLight: black;
+  --colorFontDark: aliceblue;
+
+  --boxshadow: 0 8px 12px 0 rgba(0, 0, 0, 0.2), 0 10px 24px 0 rgba(0, 0, 0, 0.19);
+  --boxshadowLight: 0 8px 12px 0 rgba(0, 0, 0, 0.2), 0 10px 24px 0 rgba(0, 0, 0, 0.19);
+  --boxshadowDark: 0 10px 20px 0 #383838, 0 12px 26px 0 #383838;
+
+  --backgroundBoxcardColor: #f7f7f799;
+  --backgroundBoxcardColorLight: #f7f7f799;
+  --backgroundBoxcardColorDark: #000000;
+
 }
 
-.card-container.card {
-  border: 2px solid gray;
-  max-width: 350px !important;
-  padding: 15px 35px;
+
+/*  DESKTOP  */
+.box {
+  padding: 10px;
+  border: 1px solid #B0B0B0CC;
+  color: var(--colorFont);
+}
+.box:hover {
+  box-shadow: var(--boxshadow);
+  transform: translateY(3px);
 }
 
-.card {
-  background-color: #f7f7f7;
-  padding: 10px 25px 30px;
-  margin: 0 auto 20px;
-  margin-top: 30px;
-  -moz-border-radius: 2px;
-  -webkit-border-radius: 2px;
-  border-radius: 2px;
-  -moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
-  -webkit-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
-  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+.box input, .box select, .box option, .box input::placeholder, .box input:focus, .box select:focus {
+  color: var(--colorFont);
+  background-color: var(--backgroundColor);
+}
+input[type="datetime-local"] {
+  cursor: pointer;
+  position: relative;
+  text-align: right;
+  padding-right: 50px; 
+   
 }
 
-.profile-img-card {
-  width: 90px;
-  height: 90px;
-  margin: 0 auto 6px;
-  display: block;
-  -moz-border-radius: 50%;
-  -webkit-border-radius: 50%;
+input[type="datetime-local"]::-webkit-calendar-picker-indicator  {
+  cursor: pointer;
+  position: absolute;
+  left: 5px;
+  height:90%;
+  width:auto;
+  content: url(calendar-icon.png);
+ }
+
+.login-register {
+  border-radius: 5px;
+  padding: 20px 40px;
+  color: var(--colorFont);
+  background-color: var(--backgroundBoxcardColor);
+}
+.login-register img {
+  width:60%;
+  margin-left:20%;
   border-radius: 50%;
+  border: 1px solid gray;
 }
 
-
-.navbar-brand {
-  margin-left: 2%;
-}
-.navbar-nav {
-  width: max-content;
-}
-.nav-item {
-  width: max-content;
-}
-.nav-link{
-  width: max-content;
-  font-size: 22px;    /* large; */
-}
-
-
-.homeContainerPicture{
+.home-picture {
   background: url(pictureBody.png) no-repeat center center fixed;
   background-size: auto;
   width:1400px;
-  height: 650px; 
+  height: 700px; 
+  color: var(--colorFont);
+}
+.home-picture p {
+  font-size: 1.5vw;
 }
 
-
-
-.searchDiv {
-  padding: 5px 50px;
-  border: 0.1px solid grey;
-  width: 35%;
+.createupdateP {
+  font-size: 1.5vw;
+}
+.messageP {
+	font-size:0.9vw;
+	color: red;
+	background-color: aliceblue;
 }
 
-.form-control input{
-  width:40%;
-  float: right;
-}
-.form-control select {
-  width:40%;
-  float: right;
+.jumbotron {
+  color: var(--colorFont);
+  background-color: var(--backgroundBoxcardColor);
 }
 
-.addButtonDiv {
-  width: 30%;
-}
+/*  MOBIL  */
 
-
-.profiTable{
-  font-size: 18px;
-}
-.profiTable td{
-  border:0.5px solid gray;
-  padding: 2px 20px 2px 20px;
-}
-
-thead {
-  background-color: #008B8B;
-  color: white;
-  font-size: larger;
-  text-align: center;
-} 
-
-tbody td{
-	text-align: center;
-}
-
-.table-striped>tbody>tr:nth-child(odd)>td, 
-.table-striped>tbody>tr:nth-child(odd)>th {
-   background-color: #FFFFF0; 
- }
-
-
- .table-hover tbody tr:hover td, 
- .table-hover tbody tr:hover th {
-  background-color: #F0FFF0;
-}
-
-
-
-.footer {
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  background-color: black;
-  color: white;
-  text-align: center;
+@media screen and (max-width: 767px) {
+  .home-picture{
+    background: url(pictureBodyMob.png) no-repeat center center fixed;
+    background-size: auto;
+    width:99%;
+    height: 650px; 
+  }
+  .home-picture p {
+    font-size: 4.5vw;
+  }
+  .createupdateP {
+    font-size: 4.5vw;
+  }
+  .messageP {
+		font-size:4.2vw;
+	}
 }

@@ -7,10 +7,10 @@ public class RoomDTO {
 	private Integer numberOfBeds;
 	private String free;
 	
-	
+	/*
 	private Integer userId;
 	private String userUsername;
-	
+	*/
 
 	public Integer getId() {
 		return id;
@@ -46,7 +46,7 @@ public class RoomDTO {
 
 	
 	
-	
+	/*
 	public Integer getUserId() {
 		return userId;
 	}
@@ -62,7 +62,7 @@ public class RoomDTO {
 	public void setUserUsername(String userUsername) {
 		this.userUsername = userUsername;
 	}
-	
+	*/
 	
 	
 	

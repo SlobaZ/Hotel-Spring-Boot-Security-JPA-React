@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
+import hotel.payload.response.MessageResponse;
+import hotel.utils.PasswordContainsLowercaseUppercaseSpecialCharacterDigit;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -14,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -28,14 +32,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import hotel.web.dto.UserDTO;
 import hotel.model.ERole;
-import hotel.model.Reservation;
 import hotel.model.Role;
 import hotel.model.User;
 import hotel.service.UserService;
 import hotel.service.impl.UserDetailsImpl;
 import hotel.support.UserDTOToUser;
 import hotel.support.UserToUserDTO;
-import hotel.utils.AuxiliaryClass;
 
 
 @CrossOrigin(origins="http://localhost:3000")
@@ -56,13 +58,15 @@ public class ApiUserController {
 	@Autowired
 	private UserDTOToUser toUser;
 	
+	@Autowired
+	private PasswordEncoder encoder;
+	
 		
 	
 	@GetMapping("/all")
 	@PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_EMPLOYEE')")
 	ResponseEntity<List<UserDTO>> getAlls() {
-		List<User> users = null;
-		users = userService.findByRoles_name(ERole.ROLE_GUEST);
+		List<User> users = userService.findAll();
 		return new ResponseEntity<>( toDTO.convert(users) , HttpStatus.OK);
 	}	
 	
@@ -115,7 +119,7 @@ public class ApiUserController {
 	@GetMapping("/{id}")
 	@PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYEE')")
 	ResponseEntity<UserDTO> getUserById(@PathVariable Integer id){
-		User user = userService.getById(id);
+		User user = userService.getReferenceById(id);
 		if(user==null){
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
@@ -156,69 +160,37 @@ public class ApiUserController {
 	
 	@PreAuthorize("hasRole('ADMIN') || hasRole('EMPLOYEE')")
 	@PutMapping(value="/{id}" , consumes = "application/json")
-	ResponseEntity<UserDTO> updateUser( @PathVariable Integer id, @Valid @RequestBody UserDTO UserDTO){
-				
-		User persisted = userService.getById(id);
+	ResponseEntity<?> updateUser( @PathVariable Integer id, @Valid @RequestBody UserDTO userDTO){
 		
-		persisted.setUsername(UserDTO.getUsername());
-		persisted.setPassword(UserDTO.getPassword());
-		persisted.setCity(UserDTO.getCity());
-		persisted.setJmbg(UserDTO.getJmbg());
-		persisted.setPhone(UserDTO.getPhone());
-		
-		userService.save(persisted);
-		
-		return new ResponseEntity<>(toDTO.convert(persisted), HttpStatus.OK);
-	}
-	
-	
-	
-	@PreAuthorize("hasRole('ADMIN') || hasRole('EMPLOYEE') || hasRole('GUEST')")
-	@GetMapping(value="/guestData/{idG}")
-	ResponseEntity<?> guestData(@PathVariable Integer idG){
-		
-		List<Reservation> reservations = userService.guestData(idG);
-		
-		if(reservations==null){
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
-		Reservation	reservation = reservations.get(0);
-		for(Reservation reserv : reservations) {
-			if(reservation.getDateTimeEntryT().before(reserv.getDateTimeEntryT())) {
-				reservation = reserv;
+		try {
+			if(userDTO==null || id==null){
+				return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 			}
-		}
-		Integer idGuest = reservation.getUser().getId();
-		String guestId = Integer.toString(idGuest) ; 
-		String guestUsername = reservation.getUser().getUsername();
-		Integer idRoom = reservation.getRoom().getId();
-		String roomId = Integer.toString(idRoom) ; 
-		String roomName = reservation.getRoom().getName();
-		String enter = reservation.getDateTimeEntryS();
-		String exit = reservation.getDateTimeOutputS();
-		
-		Double numberOfDaysD = AuxiliaryClass.TheNumberOfDays(enter, exit);
-		Double priceOfDay = AuxiliaryClass.price(numberOfDaysD, roomName);
-		
-		String numberOfDays = String.valueOf ( numberOfDaysD ) ; 
-		String price = String.valueOf ( priceOfDay ) ; 
 
-		List<String> dataGuest = new ArrayList<String>();
-		dataGuest.add(guestId);
-		dataGuest.add(guestUsername);
-		dataGuest.add(roomId);
-		dataGuest.add(roomName);
-		dataGuest.add(enter);
-		dataGuest.add(exit);
-		dataGuest.add(numberOfDays);
-		dataGuest.add(price);
+			User persisted = userService.getReferenceById(id);
+			
+			if(persisted.getPassword().equals(userDTO.getPassword())) {
+				persisted.setPassword(userDTO.getPassword());
+			}
+			else {
+				if (!PasswordContainsLowercaseUppercaseSpecialCharacterDigit.passwordContainsLowercaseUppercaseSpecialCharacterDigit(userDTO.getPassword())) {
+					return ResponseEntity.badRequest().body(new MessageResponse("Error: Password must have atleast one: digit, uppercase character, lowercase character and specail character !"));
+				}
+				persisted.setPassword(encoder.encode(userDTO.getPassword()));
+			}
+			
+			userDTO.setId(id);
+			persisted = userService.save(toUser.convert(userDTO));
+			return new ResponseEntity<>(toDTO.convert(persisted),HttpStatus.OK);
+		}
+		catch (Exception e) {
+				return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+		}
 		
-		return new ResponseEntity<List<String>>( dataGuest , HttpStatus.OK );
 	}
 	
 	
-	
-	
+		
 	
 	
 	@ExceptionHandler(value=DataIntegrityViolationException.class)

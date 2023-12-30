@@ -14,6 +14,7 @@ public class RoomToRoomDTO implements Converter<Room,RoomDTO>{
 	
 	@Override
 	public RoomDTO convert(Room room) {
+		
 		if(room==null){
 			return null;
 		}
@@ -22,13 +23,6 @@ public class RoomToRoomDTO implements Converter<Room,RoomDTO>{
 		dto.setName(room.getName());
 		dto.setNumberOfBeds(room.getNumberOfBeds());
 		dto.setFree(room.getFree());
-		
-		if(room.getUser()!=null) {
-			dto.setUserId(room.getUser().getId());
-			dto.setUserUsername(room.getUser().getUsername());
-		}
-		
-		
 				
 		return dto;
 	}

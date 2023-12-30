@@ -3,7 +3,8 @@ package hotel.web.controller;
 import java.util.List;
 
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -43,7 +44,7 @@ public class ApiRoomController {
 	
 	@Autowired
 	private RoomDTOToRoom toRoom;
-	
+		
 
 	@GetMapping("/all")
 	ResponseEntity<List<RoomDTO>> getAlls() {
@@ -81,7 +82,7 @@ public class ApiRoomController {
 	
 	@GetMapping("/{id}")
 	ResponseEntity<RoomDTO> getRoomById(@PathVariable Integer id){
-		Room room = roomService.getById(id);
+		Room room = roomService.getReferenceById(id);
 		if(room==null){
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
@@ -122,17 +123,53 @@ public class ApiRoomController {
 	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping(value="/{id}" , consumes = "application/json")
 	ResponseEntity<RoomDTO> updateRoom( @PathVariable Integer id, @Valid @RequestBody RoomDTO roomDTO){
-				
-		Room persisted = roomService.getById(id);
 		
-		persisted.setName(roomDTO.getName());
-		persisted.setNumberOfBeds(roomDTO.getNumberOfBeds());
-		persisted.setFree(roomDTO.getFree());
+		try {
+				if(roomDTO==null || id==null){
+					return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+				}
+				roomDTO.setId(id);
+				Room persisted = roomService.save(toRoom.convert(roomDTO));
+				return new ResponseEntity<>(toDTO.convert(persisted),HttpStatus.OK);
+		}
+		catch (Exception e) {
+				return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+		}
 		
-		roomService.save(persisted);
-		
-		return new ResponseEntity<>(toDTO.convert(persisted), HttpStatus.OK);
 	}
+	
+	
+	@PreAuthorize("hasRole('ADMIN') || hasRole('EMPLOYEE') || hasRole('GUEST')")
+	@GetMapping("/setAvailableRoomWhenUpdatingReservation/{id}")
+	ResponseEntity<RoomDTO> setAvailableRoomWhenUpdatingReservation(@PathVariable Integer id){
+		try {
+				Room room = roomService.setAvailableRoomWhenUpdatingReservation(id);
+				if(room==null){
+					return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+				}
+				return new ResponseEntity<>( toDTO.convert(room), HttpStatus.OK);
+		} 
+		catch (Exception e) {
+				return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	
+	
+	@GetMapping("/checkFreeRoomsToday")
+	ResponseEntity<List<RoomDTO>> checkFreeRoomsToday(){
+		try {
+				List <Room> rooms = roomService.checkFreeRoomsToday();
+				if(rooms==null){
+					return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+				}
+				return new ResponseEntity<>( toDTO.convert(rooms), HttpStatus.OK);
+		} 
+		catch (Exception e) {
+				return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 	
 	
 	
