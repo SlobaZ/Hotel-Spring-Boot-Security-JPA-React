@@ -1,9 +1,11 @@
 import React from 'react';
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useContext} from 'react';
 import AuthenticationService from "../services/AuthenticationService";
+import {UserContext} from '../services/UserContext';
 
 const Home = () => { 
 
+  const[user,setUser] = useContext(UserContext);
 
   const[currentUser,setCurrentUser] = useState(undefined);
 	const[showAdmin,setShowAdmin] = useState(false);
@@ -11,13 +13,13 @@ const Home = () => {
 
 
   useEffect(() => {
-    const user = AuthenticationService.getCurrentUser();
-		if (user) {
-			setCurrentUser(user);
-			setShowAdmin(user.roles.includes("ROLE_ADMIN"));
-      setShowEmployee(user.roles.includes("ROLE_EMPLOYEE"));
-		}
-  },[]);
+    const loggedUser = AuthenticationService.getCurrentUser();    /* JSON.parse(user);  */
+	  if (loggedUser) {
+	      setCurrentUser(loggedUser);
+        setShowAdmin(loggedUser.roles.includes("ROLE_ADMIN"));
+        setShowEmployee(loggedUser.roles.includes("ROLE_EMPLOYEE"));
+	  }
+  },[user]);
 
 
   return (

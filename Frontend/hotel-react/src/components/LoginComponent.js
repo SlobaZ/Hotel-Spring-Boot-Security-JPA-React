@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'; 
 import {useState, useRef } from 'react';
 import Form from 'react-validation/build/form';
 import Input from 'react-validation/build/input';
@@ -55,7 +55,6 @@ const Login = () => {
       AuthenticationService.login(username, password).then( 
 			() => {
         navigate("/"); 
-			  window.location.reload();  
 			},
 			(error) => {
 			const resMessage =
@@ -69,7 +68,8 @@ const Login = () => {
 			setMessage(resMessage);
         }
 		);
-		} else {
+		} 
+    else {
 			setLoading(false);
 		}
 	};
