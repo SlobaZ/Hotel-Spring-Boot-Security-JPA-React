@@ -143,6 +143,40 @@ public class JpaReservationService implements ReservationService {
 	public Reservation findByRoomId(Integer id) {
 		return reservationRepository.findByRoomId(id);
 	}
+
+	@Override
+	public List<String> reservationData(Integer idR) {
+		Reservation reservation = reservationRepository.getReferenceById(idR);
+		if(reservation==null){
+			return null;
+		}
+		Integer idGuest = reservation.getUser().getId();
+		String guestId = Integer.toString(idGuest) ; 
+		String guestUsername = reservation.getUser().getUsername();
+		Integer idRoom = reservation.getRoom().getId();
+		String roomId = Integer.toString(idRoom) ; 
+		String roomName = reservation.getRoom().getName();
+		String enter = reservation.getDateTimeEntryS();
+		String exit = reservation.getDateTimeOutputS();
+		
+		Double numberOfDaysD = AuxiliaryClass.TheNumberOfDays(enter, exit);
+		Double priceOfDay = AuxiliaryClass.price(numberOfDaysD, roomName);
+		
+		String numberOfDays = String.valueOf ( numberOfDaysD ) ; 
+		String price = String.valueOf ( priceOfDay ) ; 
+
+		List<String> dataReservation = new ArrayList<String>();
+		dataReservation.add(guestId);
+		dataReservation.add(guestUsername);
+		dataReservation.add(roomId);
+		dataReservation.add(roomName);
+		dataReservation.add(enter);
+		dataReservation.add(exit);
+		dataReservation.add(numberOfDays);
+		dataReservation.add(price);
+		
+		return dataReservation;
+	}
 	
 	
 

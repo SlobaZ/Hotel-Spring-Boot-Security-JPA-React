@@ -48,6 +48,10 @@ const ListReservations = () => {
          });
     }
 
+    const resultreservation = (id) => {
+        navigate(`/resultreservation/${id}`, {id});
+    }
+
     function formatDateTime  (value)  {
         const enteredValue = value;
         const day = enteredValue.substring(8, 10);
@@ -140,6 +144,7 @@ const ListReservations = () => {
                                                 <th> User </th>
                                                    {showEmployeeAndAdmin && (    <th> Update </th> )}
                                                    {showEmployeeAndAdmin && (    <th> Delete </th> )}
+                                                   {showEmployeeAndAdmin && (    <th> Result </th> )}
                                                </tr>
                                            </thead>
                                            <tbody>
@@ -157,6 +162,7 @@ const ListReservations = () => {
                                                             {showEmployeeAndAdmin && ( 
                                                              <td data-label="Delete"> <button onClick={ () => deleteReservation(reservation.id)} className="btn btn-delete"> <i className='fas fa-trash-alt'></i> Delete </button> </td>
                                                             )}
+                                                            <td data-label="Result"><button onClick={ () => resultreservation(reservation.id)} className="btn btn-select"> <i class="fa fa-calculator"></i> Result </button></td>
                                                        </tr>
                                                    )
                                                }

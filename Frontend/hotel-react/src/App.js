@@ -23,6 +23,7 @@ import AddOrUpdateRoom from "./components/rooms/AddOrUpdateRoomComponent.jsx";
 import ListUsers from "./components/users/ListUsersComponent.jsx";
 import AddOrUpdateUser from "./components/users/AddOrUpdateUserComponent.jsx";
 import ListReservations from "./components/reservations/ListReservationsComponent";
+import ShowReservationCalculations from './components/reservations/ShowReservationCalculations.jsx';
 import AddOrUpdateReservation from "./components/reservations/AddOrUpdateReservationComponent";
 import ListRoomsPrices from "./components/roomsprices/ListRoomsPricesComponent.jsx";
 import CreateReservation from "./components/reserve/CreateReservation.jsx";
@@ -82,6 +83,7 @@ function App() {
           <Route path="/update-user/:id" element={<AddOrUpdateUser/>} />
           <Route path="/reservations" element={<ListReservations/>} />
           <Route path="/addorupdate-reservation/:id" element={<AddOrUpdateReservation/>} /> 
+          <Route path="/resultreservation/:id" element={<ShowReservationCalculations/>} />
           <Route path="/createreservation" element={<CreateReservation/>} />
           <Route path="/reserve/:id" element={<Reserve/>} />
           <Route path="/showcalculate/:id" element={<ShowUsersCalculations/>} />

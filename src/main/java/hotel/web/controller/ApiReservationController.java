@@ -186,6 +186,24 @@ public class ApiReservationController {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 	
+	
+	@PreAuthorize("hasRole('ADMIN') || hasRole('EMPLOYEE') || hasRole('GUEST')")
+	@GetMapping(value="/reservationData/{idR}")
+	ResponseEntity<?> reservationData(@PathVariable Integer idR){
+		
+		try {
+			List<String> dataReservation = reservationService.reservationData(idR);
+			if(dataReservation==null){
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+			return new ResponseEntity<List<String>>( dataReservation , HttpStatus.OK );
+		}
+		catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+		}
+
+	}
+	
 
 	
 	

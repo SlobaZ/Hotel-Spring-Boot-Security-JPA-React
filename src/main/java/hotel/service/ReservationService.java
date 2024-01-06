@@ -28,9 +28,11 @@ public interface ReservationService {
 	List<Reservation> findByRoomOrderByDateTimeOutputTDesc (Room room);
 	
 	
-	List<String> guestData( @Param("idG") Integer idG);
+	List<String> guestData(Integer idG);
 	
 	Reservation findByRoomId(Integer id);
+	
+	List<String> reservationData(Integer idR);
 	
 	
 }

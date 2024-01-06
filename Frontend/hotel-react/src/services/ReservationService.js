@@ -42,8 +42,12 @@ const USER_API_BASE_URL = "http://localhost:8080/api/users";
     	return axios.get(RESERVATION_API_BASE_URL + '/guestData/' + userId , { headers: authHeader() });
     }
 
+    const reservationData = (reservationId) => {
+    	return axios.get(RESERVATION_API_BASE_URL + '/reservationData/' + reservationId , { headers: authHeader() });
+    }
+
 const ReservationService = { 
-    getAlls, getReservations, createReservation, getReservationById, updateReservation, deleteReservation, getRooms, getUsers, guestData
+    getAlls, getReservations, createReservation, getReservationById, updateReservation, deleteReservation, getRooms, getUsers, guestData, reservationData
 }
 
 export default ReservationService;
